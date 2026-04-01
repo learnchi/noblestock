@@ -1,0 +1,10 @@
+Options -Indexes
+DirectoryIndex index.php
+
+<Files ~ "\.(log|ini|sh|sql|gz)$">
+  Deny from all
+</Files>
+
+<Files ~ "^\.ht">
+  Deny from all
+</Files>

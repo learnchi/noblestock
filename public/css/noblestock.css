@@ -1,0 +1,195 @@
+@charset "UTF-8";
+/** 
+ * 全画面共通
+ **/
+:root {
+  /* NobleStock 基本カラー */
+  --ns-green: #578C78;
+  --ns-green-dark: #3C6E5F;
+  --ns-green-light: #D2E6DF;
+  --ns-orange: #EBA05A;
+  --ns-orange-dark: #D2823C;
+
+
+  /* 基本カラー */
+  --bs-primary: var(--ns-green);
+  --bs-success: #78B496;
+  --bs-warning: var(--ns-orange);
+  --bs-body-bg: #F8FAF9;
+  --bs-body-color: #3C4144;
+  --bs-border-color: #E6EBE9;
+
+  --ns-focus-ring: rgba(87, 140, 120, 0.25);
+}
+
+  /* 基本ボタン */
+.btn-primary {
+  --bs-btn-bg: var(--ns-green);
+  --bs-btn-border-color: var(--ns-green);
+  --bs-btn-hover-bg: var(--ns-green-dark);
+  --bs-btn-hover-border-color: var(--ns-green-dark);
+  --bs-btn-active-bg: var(--ns-green-dark);
+  --bs-btn-active-border-color: var(--ns-green-dark);
+  
+  --bs-btn-focus-box-shadow: 0 0 0 0.25rem rgba(87, 140, 120, 0.25);
+
+  --bs-btn-disabled-bg: color-mix(in srgb, var(--ns-green) 70%, #ffffff);
+  --bs-btn-disabled-border-color: color-mix(in srgb, var(--ns-green) 70%, #ffffff);
+  --bs-btn-disabled-color: #ffffff;
+}
+.btn-danger {
+  --bs-btn-color: #fff;
+  --bs-btn-bg: var(--ns-orange);
+  --bs-btn-border-color: var(--ns-orange);
+  --bs-btn-hover-color: #fff;
+  --bs-btn-hover-bg: var(--ns-orange-dark);
+  --bs-btn-hover-border-color: var(--ns-orange-dark);
+  /* --bs-btn-focus-shadow-rgb: 225,83,97; */
+  --bs-btn-active-color: #fff;
+  --bs-btn-active-bg: var(--ns-orange-dark);
+  --bs-btn-active-border-color: var(--ns-orange-dark);
+  /* --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125); */
+  --bs-btn-disabled-color: #fff;
+  --bs-btn-disabled-bg: var(--ns-orange);
+  --bs-btn-disabled-border-color: var(--ns-orange);
+}
+
+  /* 画面ごとのテーマカラー （body classで指定）*/
+body.product {    /** 商品操作系 **/
+    --ns-accent: #578C78;
+    --na-border-color: #BFD8CF;
+}
+
+body.stock {    /** 在庫操作系 **/
+    --ns-accent: #6E8C69;
+    --na-border-color: #C7D8C1;
+}
+body.barcode {    /** バーコード出力系系 **/
+    --ns-accent: #BEA05A;
+    --na-border-color: #E6D6B3;
+}
+body.history {    /** 操作確認系 **/
+    --ns-accent: #7891A0;
+    --na-border-color: #CAD6DC;
+}
+body.maintenance {    /** マスターメンテナンス系 **/
+    --ns-accent: #3C4B69;
+    --na-border-color: #C2CAD8;
+}
+
+  /* ヘッダーのふちの色を画面ごとのテーマカラーにする */
+nav.navbar {
+    border-left: 4px solid var(--ns-accent);
+    border-bottom: 1px solid var(--na-border-color);
+}
+
+/** リンク **/
+a {
+    color:var(--ns-green-dark);
+}
+
+/** ページネーション **/
+.pagination {
+  --bs-pagination-color: var(--ns-green);
+  --bs-pagination-bg: var(--bs-body-bg);
+  --bs-pagination-border-width: var(--bs-border-width);
+  --bs-pagination-border-color: var(--bs-border-color);
+  --bs-pagination-border-radius: var(--bs-border-radius);
+  --bs-pagination-hover-color: var(--ns-green-dark);
+  --bs-pagination-hover-bg: var(--bs-tertiary-bg);
+  --bs-pagination-hover-border-color: var(--bs-border-color);
+  --bs-pagination-focus-color: var(--ns-green-dark);
+  --bs-pagination-focus-bg: var(--bs-secondary-bg);
+  --bs-pagination-focus-box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  --bs-pagination-active-color: #fff;
+  --bs-pagination-active-bg: var(--ns-green);
+  --bs-pagination-active-border-color: var(--ns-green-dark);
+  --bs-pagination-disabled-color: var(--bs-secondary-color);
+  --bs-pagination-disabled-bg: var(--bs-secondary-bg);
+  --bs-pagination-disabled-border-color: var(--bs-border-color);
+}
+
+  /* ログイン画面 */
+body.login {
+  min-height: 100vh;
+
+  background-image: url("../img/login_bg.png");
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-size: auto 100%;
+  background-position: 30% center;
+}
+
+body.login main {
+    max-width: 330px;
+    min-height: unset;
+    overflow-y: unset;
+    padding: 1rem;
+}
+
+  /* 全画面共通 */
+main {
+    min-height: calc(100vh - 4rem - 2.4rem);    /** 100%から、ヘッダー高さとフッター高さを引く */
+    overflow-y:hidden;
+}
+    main div#table-wrapper {
+        max-height: calc(100vh - 4rem - 2.4rem - 7rem);
+    }
+    main div#table-wrapper.narrow {
+        max-height: calc(100vh - 4rem - 2.4rem - 11rem);
+    }
+
+/**
+ * form部品
+**/
+.form-control, .form-select {
+    white-space: nowrap;
+    width: fit-content;   /** 100%から上書き **/
+    margin: 0.12rem;   /** 0から上書き **/
+}
+.form-control:focus, .form-select:focus, .form-check-input:focus, .page-link:focus {
+  border-color: var(--ns-green-light);
+  box-shadow: 0 0 0 .25rem var(--ns-focus-ring);
+}
+.form-check-input:checked {
+  background-color: var(--ns-green);
+  border-color: var(--ns-green-dark);
+}
+
+.dropdown-item:active {
+  color: var(--bs-dropdown-link-active-color);
+  background-color: var(--ns-green);
+}
+
+
+/**
+ * alert部品
+**/
+.alert {
+    --bs-alert-padding-x: .5rem;   /** 1remから上書き **/
+    --bs-alert-padding-y: .5rem;   /** 1remから上書き **/
+    --bs-alert-margin-bottom: .5rem;   /** 1remから上書き **/
+}
+.alert-dismissible .btn-close {
+    padding: 0.75rem 1rem;    /** 1.25rem 1remから上書き **/
+}
+/**
+ * card-image
+ **/
+img.card-img-fit {
+    width: 100%;
+    aspect-ratio: 4 / 3;   /* 横 : 縦 = 4 : 3 → 縦は横の3/4 */
+    object-fit: cover;
+    object-position: center;
+}
+/** list-group **/
+.list-group.list-group-flush .list-group-item {
+    border-top-width: 0 !important;  /** list-group-flushを下線のみにする **/
+}
+/**
+ * 商品情報のmodal幅を標準より広げる
+ **/
+
+div[id^="productModal"].modal .modal-dialog {
+    --bs-modal-width: 720px;    /** 500px; **/
+}

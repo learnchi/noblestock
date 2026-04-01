@@ -1,0 +1,35 @@
+{
+    "name": "studiogau/noblestock",
+    "description": "\"NobleStock is an inventory management application built on the PHP framework Chandra, supporting barcode generation and barcode-based stock in/out operations.\"",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Noblestock\\Logic\\": "Logic/",
+            "Noblestock\\Util\\": "Util/",
+            "Noblestock\\DbLogic\\": "DbLogic/"
+        },
+        "classmap": []
+    },
+    "authors": [
+        {
+            "name": "learnchi",
+            "email": "learnchiee@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "studiogau/chandra": "dev-main",
+        "phpoffice/phpspreadsheet": "^2",
+        "picqer/php-barcode-generator": "^3.2",
+        "phpmailer/phpmailer": "^7.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^11.5"
+    },
+
+
+    "repositories": [
+    { "type": "vcs", "url": "https://github.com/learnchi/chandra.git", "no-api": true }
+    ]
+}

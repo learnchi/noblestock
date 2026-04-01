@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="tests/bootstrap.php" colors="true" stopOnFailure="false" cacheDirectory=".phpunit.cache">
+  <testsuites>
+    <testsuite name="Noblestock">
+      <directory suffix="Test.php">tests</directory>
+    </testsuite>
+  </testsuites>
+  <source>
+    <include>
+      <directory>public</directory>
+      <directory>DbLogic</directory>
+      <directory>Logic</directory>
+    </include>
+  </source>
+</phpunit>

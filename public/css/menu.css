@@ -1,0 +1,88 @@
+@charset "UTF-8";
+/** 
+ * メニュー画面
+ **/
+:root {
+    --ns-focus-ring: rgba(87, 140, 120, 0.25);
+}
+/** メニューボタン共通 **/
+main div#menu-container a.btn {
+    width: 450px;
+    height: 120px;
+
+    /* 共通見た目 */
+    --bs-btn-color: #3C4144;
+    --bs-btn-bg: #ffffff;
+    --bs-btn-border-color: #E6EBE9;
+
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06);
+
+    --bs-btn-hover-color: #3C4144;
+    --bs-btn-hover-bg: #ffffff;
+    --bs-btn-hover-border-color: #E6EBE9;
+
+    --bs-btn-disabled-color: #6E7376;
+    --bs-btn-disabled-bg: #ffffff;
+    --bs-btn-disabled-border-color: #E6EBE9;
+}
+    /** フォーカスリング（全ボタン共通） **/
+    main div#menu-container a.btn:focus-visible {
+        outline: none;
+
+        box-shadow:
+            0 0 0 3px var(--ns-focus-ring),
+            0 4px 8px rgba(0, 0, 0, 0.06);
+    }
+
+main div#menu-container a.btn-product {    /** 商品操作系 **/
+    --ns-accent: #578C78;
+    --ns-active-bg: #D2E6DF;
+
+    border-left: 4px solid var(--ns-accent);
+
+    --bs-btn-active-color: #3C4144;
+    --bs-btn-active-bg: var(--ns-active-bg);
+    --bs-btn-active-border-color: #BFD8CF;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.15);
+}
+
+main div#menu-container a.btn-stock {    /** 在庫操作系 **/
+    --ns-accent: #6E8C69;
+    --ns-active-bg: #DCE8D7;
+
+    border-left: 4px solid var(--ns-accent);
+
+    --bs-btn-active-bg: var(--ns-active-bg);
+    --bs-btn-active-border-color: #C7D8C1;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.15);
+}
+main div#menu-container a.btn-barcode {    /** バーコード出力系系 **/
+    --ns-accent: #BEA05A;
+    --ns-active-bg: #F5EBD2;
+
+    border-left: 4px solid var(--ns-accent);
+
+    --bs-btn-active-bg: var(--ns-active-bg);
+    --bs-btn-active-border-color: #E6D6B3;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.15);
+}
+main div#menu-container a.btn-history {    /** 操作確認系 **/
+    --ns-accent: #7891A0;
+    --ns-active-bg: #E1E8EC;
+
+    border-left: 4px solid var(--ns-accent);
+
+    --bs-btn-active-bg: var(--ns-active-bg);
+    --bs-btn-active-border-color: #CAD6DC;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.15);
+}
+main div#menu-container a.btn-maintenance {    /** マスターメンテナンス系 **/
+    --ns-accent: #3C4B69;
+    --ns-active-bg: #D7DCE6;
+
+    border-left: 4px solid var(--ns-accent);
+
+    --bs-btn-active-bg: var(--ns-active-bg);
+    --bs-btn-active-border-color: #C2CAD8;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.15);
+}
