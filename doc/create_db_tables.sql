@@ -110,7 +110,7 @@ create table histories (
     stock_in int unsigned,  -- 入庫数
     move_stock int unsigned,  -- 移動数 追加
     location_stock int unsigned,  -- 店舗在庫数 追加
-    stock int insigned,  -- 在庫数（全店舗合計）
+    stock int unsigned,  -- 在庫数（全店舗合計）
     del_flg tinyint not null default 0,
     created_at datetime not null,
     created_by varchar(16) not null,

@@ -3,7 +3,7 @@
  * ユーザー登録確認
  */
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 
@@ -27,19 +27,19 @@ $logger = Logger::createDefault(dirname(__DIR__, 1));
 // 認証チェック
 $auth = new AuthService(new UserRepository(), $logger);
 if (!$auth->checkUserSession()) {
-	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getLoginId());
 	if (session_status() !== PHP_SESSION_ACTIVE) {
-		@session_start();
+		session_start();
 	}
 	SessionHelper::FlushError(MessageConst::MSG_INF_AUTH_002);
 	// チェック結果がエラーの場合ログイン画面に遷移
-	header("Location: index.php");
+	header("Location: index.php", true, 302);
 	exit;
 }
 // screenごとの権限チェック
 $filename = basename(__FILE__, '.php');
 if ($auth->getCurrentUser()?->can($filename) === false) {
-    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId());
+    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
 	http_response_code(403);
 	header('Content-Type: text/plain; charset=UTF-8');
 	echo MessageConst::MSG_INF_AUTH_003;
@@ -60,9 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$csrfScope = (string)($_POST[Utility::getCsrfScopeFieldName()] ?? '');
 	$csrfToken = (string)($_POST[Utility::getCsrfFieldName()] ?? '');
 	if (!Utility::validatePostedCsrfToken($csrfScope, $csrfToken)) {
-		$logger->error(basename(__FILE__).' op=user.confirm msg="Invalid csrf token" page=user_confirm.php user_id='.$auth->getCurrentUser()?->getUserId());
+		$logger->error(basename(__FILE__).' op=user.confirm msg="Invalid csrf token" page=user_confirm.php user_id='.$auth->getCurrentUser()?->getLoginId());
 		SessionHelper::FlushError(MessageConst::MSG_SYS_COMMON_900);
-		header("Location: user_create.php");
+		header("Location: user_create.php", true, 303);
 		exit;
 	}
 
@@ -119,9 +119,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		}
 
 		// ユーザーID存在チェック
-		$existedUserId = $user->getIdByUserId($userData["login_id"]);
+		$existingUserId = $user->getIdByUserId($userData["login_id"]);
 
-		if ($existedUserId > 0) {
+		if ($existingUserId !== null) {
 			$errors['login_id'] = MessageConst::MSG_SYS_USER_003;
 		}
 
@@ -129,7 +129,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 			// バリデーションエラーなので、入力画面をもう一度描画
 			SessionHelper::setData($funcId, "validation-errors", $errors);
-    		header("Location: user_create.php");
+    		header("Location: user_create.php", true, 303);
 			exit;
 		}
 	}
@@ -140,17 +140,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			// 登録
 			$insCnt = $user->insert($userData);
 			SessionHelper::flushSuccess(Utility::replaceStr(MessageConst::MSG_OK_USER_008, $userData['login_id']));
-			header("Location: user_list.php");
+			header("Location: user_list.php", true, 303);
 			exit;
 		} catch (\Throwable $e) { 
-			$logger->error(basename(__FILE__).' op=user.insert msg="Error occurred during user insert" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId()).' detail='.$e->getMessage();
+			$logger->error(basename(__FILE__).' op=user.insert msg="Error occurred during user insert" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId()).' detail='.$e->getMessage();
 			SessionHelper::flushError(MessageConst::MSG_SYS_COMMON_900);
-    		header("Location: user_create.php");
+    		header("Location: user_create.php", true, 303);
 			exit;
 		}
 	}
     // 画面表示はGETでredirect
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header('Location: user_confirm.php', true, 303);
     exit;
 }
 if (is_null($userData)) {

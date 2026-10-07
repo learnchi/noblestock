@@ -25,7 +25,8 @@ class UserRepository implements UserRepositoryInterface
         }
 
         // カラム名を合わせる
-        $ret['user_id'] = $row['login_id'];
+        $ret['id'] = $row['id'];
+        $ret['login_id'] = $row['login_id'];
         $ret['user_name'] = $row['user_name'];
 
         // authority の長さを揃える（事故防止）

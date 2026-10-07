@@ -503,7 +503,7 @@ final class ProductCreatePageTest extends ImageWebTestCase
         $bridgeCode = <<<'PHP'
 <?php
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 require_once __DIR__ . '/../vendor/autoload.php';

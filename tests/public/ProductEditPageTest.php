@@ -17,6 +17,7 @@ final class ProductEditPageTest extends WebTestCase
 
         $response = $this->getClient()->get('product_edit.php');
         $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertInitialStatus($response, 302);
         $this->assertStringContainsString('Location: index.php', $response->headers);
     }
 
@@ -27,6 +28,7 @@ final class ProductEditPageTest extends WebTestCase
 
         $response = $this->getClient()->get('product_edit.php');
         $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertInitialStatus($response, 302);
         $this->assertStringContainsString('Location: index.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_INF_AUTH_002, $response->body);
     }
@@ -149,6 +151,7 @@ final class ProductEditPageTest extends WebTestCase
         $followUpResponse = $this->getClient()->get('product_edit.php');
 
         $this->assertOk($response);
+        $this->assertInitialStatus($response, 303);
         $this->assertStringContainsString('Location: product_edit.php?mn=ABC001', $response->headers);
         $this->assertInputValue($response, 'management_no', 'ABC001');
         $this->assertInputValue($response, 'product_name', $expected['product_name']);
@@ -255,10 +258,13 @@ final class ProductEditPageTest extends WebTestCase
         $sourceResponse = $this->getClient()->get($filename . '.php');
         $this->assertOk($sourceResponse);
 
-        return $this->getClient()->post('product_edit.php', [
+        $response = $this->getClient()->post('product_edit.php', [
             'mngNo' => $managementNo,
             'filename' => $filename,
         ] + $this->extractCsrfPostData($sourceResponse));
+        $this->assertInitialStatus($response, 303);
+
+        return $response;
     }
 
     // products テーブルから対象商品の商品情報を取得する。

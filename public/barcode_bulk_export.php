@@ -3,7 +3,7 @@
  * バーコードExcel一括出力
  */
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 // composerを使用
 require_once(__DIR__ . '/../vendor/autoload.php');
@@ -41,13 +41,13 @@ $logger = Logger::createDefault(dirname(__DIR__, 1));
 // 認証チェック
 $auth = new AuthService(new UserRepository(), $logger);
 if (!$auth->checkUserSession()) {
-	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getLoginId());
 	if (session_status() !== PHP_SESSION_ACTIVE) {
-		@session_start();
+		session_start();
 	}
 	SessionHelper::FlushError(MessageConst::MSG_INF_AUTH_002);
 	// チェック結果がエラーの場合ログイン画面に遷移
-	header("Location: index.php");
+	header("Location: index.php", true, 303);
 	exit;
 }
 // screenごとの権限チェック不要
@@ -64,7 +64,7 @@ $funcId = "com901";
 $csrfScope = (string)($_POST[Utility::getCsrfScopeFieldName()] ?? '');
 $csrfToken = (string)($_POST[Utility::getCsrfFieldName()] ?? '');
 if (!Utility::validatePostedCsrfToken($csrfScope, $csrfToken)) {
-	$logger->error(basename(__FILE__).' op=csrf.validate msg="Invalid csrf token" user_id='.$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__).' op=csrf.validate msg="Invalid csrf token" user_id='.$auth->getCurrentUser()?->getLoginId());
 	SessionHelper::FlushError(MessageConst::MSG_SYS_COMMON_900);
 	$backTo = SessionHelper::getData("com901", "backTo");
 	if ($backTo === null || $backTo === '') {
@@ -77,7 +77,7 @@ if (!Utility::validatePostedCsrfToken($csrfScope, $csrfToken)) {
 			$backTo = 'barcode_create';
 		}
 	}
-	header("Location: ".$backTo.".php");
+	header("Location: ".$backTo.".php", true, 303);
 	exit;
 }
 
@@ -97,8 +97,23 @@ $fileName .= "_barcode_".date("Ymd");
 
 // ユーザー情報取得
 $user = new User();
-$wkus = $user->getIdByUserId($auth->getCurrentUser()?->getUserId());
-$userSeq = "u".$wkus["id"]."_";
+$currentLoginId = $auth->getCurrentUser()?->getLoginId();
+$currentUserId = $currentLoginId === null ? null : $user->getIdByUserId($currentLoginId);
+if ($currentUserId === null) {
+	$logger->error(
+		basename(__FILE__)
+		. ' op=user.lookup msg="current user not found"'
+		. ' login_id=' . ($currentLoginId ?? 'null')
+	);
+	$auth->logout();
+	if (session_status() !== PHP_SESSION_ACTIVE) {
+		session_start();
+	}
+	SessionHelper::FlushError(MessageConst::MSG_INF_AUTH_002);
+	header("Location: index.php", true, 303);
+	exit;
+}
+$userSeq = "u".$currentUserId."_";
 
 // バーコード一覧取得
 $barlist = SessionHelper::getData($funcId, "barlist");

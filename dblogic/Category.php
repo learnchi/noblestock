@@ -36,7 +36,7 @@ SQL;
 
         // 監査項目用 userId を設定（取れなければ Database 側の SYSTEM のまま）
 		$auth = new AuthService(new UserRepository(), $this->logger);
-        $userId = $auth->getCurrentUser()?->getUserId();
+        $userId = $auth->getCurrentUser()?->getLoginId();
         if (!empty($userId)) {
             $this->database->setCurrentUserId($userId);
         }

@@ -209,7 +209,7 @@ final class BarcodeProcessor
     private function undoChange(string $bcin): CommandResult
     {
 
-        $user_id = $this->auth->getCurrentUser()?->getUserId();
+        $user_id = $this->auth->getCurrentUser()?->getLoginId();
 		$undo_location_no = SessionHelper::getData($this->funcId, "undo_location_no");  // 店舗NO
 		if (!empty($undo_location_no)) {
 			$undo_management_no = SessionHelper::getData($this->funcId, "undo_management_no");  // 管理番号
@@ -218,7 +218,7 @@ final class BarcodeProcessor
 			$check = new Check();
 			// チェック数変更処理
 			try {
-				$rtnChange = $check->change($this->auth->getCurrentUser()?->getUserId(), $undo_location_no, $undo_management_no, $undo_check_count, false);
+				$rtnChange = $check->change($this->auth->getCurrentUser()?->getLoginId(), $undo_location_no, $undo_management_no, $undo_check_count, false);
 				SessionHelper::FlushSuccess(Utility::replaceStr(MessageConst::MSG_OK_BARCODE_007,$undo_management_no,$undo_check_count));
 			} catch (\Exception $e) {
 				// エラー
@@ -786,7 +786,7 @@ final class BarcodeProcessor
 		// ロジック
 		$stock = new Stock();
         
-        $user_id = $this->auth->getCurrentUser()?->getUserId();
+        $user_id = $this->auth->getCurrentUser()?->getLoginId();
 
 		if (!empty($locData)) {
 			// 在庫チェック情報取得

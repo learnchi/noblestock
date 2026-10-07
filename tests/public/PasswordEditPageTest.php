@@ -97,7 +97,7 @@ final class PasswordEditPageTest extends WebTestCase
         ] + $csrfFields);
 
         $this->assertOk($response);
-        $this->assertStringContainsString('Location: /noblestock/public/password_edit.php', $response->headers);
+        $this->assertStringContainsString('Location: password_edit.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_SYS_AUTH_006, $response->body);
         $this->assertSame($beforeHash, $this->readPasswordHash('admin'));
     }
@@ -116,7 +116,7 @@ final class PasswordEditPageTest extends WebTestCase
         ] + $csrfFields);
 
         $this->assertOk($response);
-        $this->assertStringContainsString('Location: /noblestock/public/password_edit.php', $response->headers);
+        $this->assertStringContainsString('Location: password_edit.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_SYS_AUTH_006, $response->body);
         $this->assertSame($beforeHash, $this->readPasswordHash('admin'));
     }
@@ -135,7 +135,7 @@ final class PasswordEditPageTest extends WebTestCase
         ] + $csrfFields);
 
         $this->assertOk($response);
-        $this->assertStringContainsString('Location: /noblestock/public/password_edit.php', $response->headers);
+        $this->assertStringContainsString('Location: password_edit.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_SYS_AUTH_006, $response->body);
         $this->assertSame($beforeHash, $this->readPasswordHash('admin'));
     }
@@ -152,7 +152,7 @@ final class PasswordEditPageTest extends WebTestCase
         ]);
 
         $this->assertOk($response);
-        $this->assertStringContainsString('Location: /noblestock/public/password_edit.php', $response->headers);
+        $this->assertStringContainsString('Location: password_edit.php', $response->headers);
         $this->assertSame($beforeHash, $this->readPasswordHash('admin'));
     }
 
@@ -170,7 +170,7 @@ final class PasswordEditPageTest extends WebTestCase
         ]);
 
         $this->assertOk($response);
-        $this->assertStringContainsString('Location: /noblestock/public/password_edit.php', $response->headers);
+        $this->assertStringContainsString('Location: password_edit.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_SYS_COMMON_900, $response->body);
         $this->assertSame($beforeHash, $this->readPasswordHash('admin'));
     }

@@ -16,6 +16,7 @@ final class UserEditPageTest extends WebTestCase
 
         $response = $this->getClient()->get('user_edit.php');
         $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertInitialStatus($response, 302);
         $this->assertStringContainsString('Location: index.php', $response->headers);
     }
 
@@ -26,6 +27,7 @@ final class UserEditPageTest extends WebTestCase
 
         $response = $this->getClient()->get('user_edit.php');
         $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertInitialStatus($response, 302);
         $this->assertStringContainsString('Location: index.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_INF_AUTH_002, $response->body);
     }
@@ -243,6 +245,7 @@ final class UserEditPageTest extends WebTestCase
         $response = $this->getClient()->post('user_edit.php', [
             'id' => $id,
         ] + $this->extractCsrfPostData($sourceResponse));
+        $this->assertInitialStatus($response, 303);
         $this->assertOk($response);
 
         return $response;

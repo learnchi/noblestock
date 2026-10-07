@@ -4,7 +4,7 @@
  * 商品一覧 画面から、バーコード商品選択出力の選択状態を変更した場合
  */
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 
@@ -26,7 +26,7 @@ $logger = Logger::createDefault(dirname(__DIR__, 1));
 // 認証チェック
 $auth = new AuthService(new UserRepository(), $logger);
 if (!$auth->checkUserSession()) {
-	$logger->error(basename(__FILE__) . " checkUserSession failed for user id id=" . $auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__) . " checkUserSession failed for user id id=" . $auth->getCurrentUser()?->getLoginId());
 	http_response_code(401);
 	echo json_encode(['ok' => false, 'error' => 'unauthorized']);
 	exit;
@@ -36,7 +36,7 @@ if (!$auth->checkUserSession()) {
 $filename = "product_list";
 $filename = "product_list";
 if ($auth->getCurrentUser()?->can($filename) === false) {
-    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId());
+    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
 	http_response_code(404);
 	echo json_encode(['ok' => false, 'error' => 'not_found']);
 	exit;
@@ -44,7 +44,7 @@ if ($auth->getCurrentUser()?->can($filename) === false) {
 
 // AJAX窓口は POST のみ
 if (($_SERVER['REQUEST_METHOD'] ?? '') !== 'POST') {
-	$logger->error(basename(__FILE__) . " AJAX窓口はPOSTのみ REQUEST_METHOD=" . ($_SERVER['REQUEST_METHOD'] ?? '').' user_id='.$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__) . " AJAX窓口はPOSTのみ REQUEST_METHOD=" . ($_SERVER['REQUEST_METHOD'] ?? '').' user_id='.$auth->getCurrentUser()?->getLoginId());
 	http_response_code(405);
 	echo json_encode(['ok' => false, 'error' => 'method_not_allowed']);
 	exit;
@@ -70,7 +70,7 @@ $nextCsrf = static function (): array {
 };
 
 if (!Utility::validatePostedCsrfToken($csrfScope, $csrfToken)) {
-	$logger->error(basename(__FILE__).' op=csrf.validate msg="Invalid csrf token" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__).' op=csrf.validate msg="Invalid csrf token" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
 	http_response_code(403);
 	echo json_encode(['ok' => false, 'error' => 'invalid_csrf'] + $nextCsrf(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 	exit;
@@ -91,7 +91,7 @@ try {
 
 			// MANAGEMENT_NOの形式に合わせて制限（必要なら調整）
 			if ($mngNo === '' || !preg_match('/^[A-Za-z0-9_-]+$/', $mngNo)) {
-				$logger->error(basename(__FILE__) . " toggleSelect データ不正 mngNo=" . $mngNo.' user_id='.$auth->getCurrentUser()?->getUserId());
+				$logger->error(basename(__FILE__) . " toggleSelect データ不正 mngNo=" . $mngNo.' user_id='.$auth->getCurrentUser()?->getLoginId());
 				http_response_code(400);
 				echo json_encode(['ok' => false, 'error' => 'invalid_mngNo']);
 				exit;
@@ -127,7 +127,7 @@ try {
 		case 'selectAll': {
 			$mngNos = $data['mngNos'] ?? [];
 			if (!is_array($mngNos)) {
-				$logger->error(basename(__FILE__) . " selectAll データ不正 mngNos=" . print_r($mngNos, true).' user_id='.$auth->getCurrentUser()?->getUserId());
+				$logger->error(basename(__FILE__) . " selectAll データ不正 mngNos=" . print_r($mngNos, true).' user_id='.$auth->getCurrentUser()?->getLoginId());
 				http_response_code(400);
 				echo json_encode(['ok' => false, 'error' => 'invalid_mngNos']);
 				exit;
@@ -176,7 +176,7 @@ try {
 		case 'clearVisible': {
 			$mngNos = $data['mngNos'] ?? [];
 			if (!is_array($mngNos)) {
-				$logger->error(basename(__FILE__) . " clearVisible データ不正 mngNos=" . print_r($mngNos, true).' user_id='.$auth->getCurrentUser()?->getUserId());
+				$logger->error(basename(__FILE__) . " clearVisible データ不正 mngNos=" . print_r($mngNos, true).' user_id='.$auth->getCurrentUser()?->getLoginId());
 				http_response_code(400);
 				echo json_encode(['ok' => false, 'error' => 'invalid_mngNos']);
 				exit;
@@ -223,7 +223,7 @@ try {
 	}
 
 } catch (Throwable $e) {
-	$logger->error(basename(__FILE__).' op=ajax.update msg="Error occurred during ajax execute" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId()).' detail='.$e->getMessage();
+	$logger->error(basename(__FILE__).' op=ajax.update msg="Error occurred during ajax execute" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId()).' detail='.$e->getMessage();
 	http_response_code(500);
 	echo json_encode(['ok' => false, 'error' => 'server_error']);
 	exit;

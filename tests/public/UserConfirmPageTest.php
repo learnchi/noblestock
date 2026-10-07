@@ -154,6 +154,7 @@ final class UserConfirmPageTest extends WebTestCase
         $response = $this->getClient()->post('user_confirm.php', [
             'mode' => 'insert',
         ]);
+        $this->assertInitialStatus($response, 303);
         $this->assertOk($response);
 
         $this->assertStringContainsString('ユーザーを登録しました ログインID：new901', $response->body);
@@ -229,6 +230,7 @@ final class UserConfirmPageTest extends WebTestCase
             'sort_order' => '20',
             'auth_screen' => ['0', '1', '18'],
         ], $overrides));
+        $this->assertInitialStatus($response, 303);
         $this->assertOk($response);
 
         return $response;

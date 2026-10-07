@@ -3,7 +3,7 @@
  * 在庫チェック 画面
  */
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 // composerを使用
@@ -25,19 +25,19 @@ $logger = Logger::createDefault(dirname(__DIR__, 1));
 // 認証チェック
 $auth = new AuthService(new UserRepository(), $logger);
 if (!$auth->checkUserSession()) {
-	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getLoginId());
 	if (session_status() !== PHP_SESSION_ACTIVE) {
-		@session_start();
+		session_start();
 	}
 	SessionHelper::FlushError(MessageConst::MSG_INF_AUTH_002);
 	// チェック結果がエラーの場合ログイン画面に遷移
-	header("Location: index.php");
+	header("Location: index.php", true, 302);
 	exit;
 }
 // screenごとの権限チェック
 $filename = basename(__FILE__, '.php');
 if ($auth->getCurrentUser()?->can($filename) === false) {
-    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId());
+    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
 	http_response_code(403);
 	header('Content-Type: text/plain; charset=UTF-8');
 	echo MessageConst::MSG_INF_AUTH_003;
@@ -54,9 +54,9 @@ SessionHelper::clearDataExceptFunc($funcId);
 $locationList = SessionHelper::getMasterList("locationList");
 if (empty($locationList)) {
 	// マスターデータがない→マスターメンテナンスメニュー画面へ
-	$logger->error(basename(__FILE__).' op=master msg="locationList is empty" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__).' op=master msg="locationList is empty" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
 	SessionHelper::flushError(MessageConst::MSG_SYS_MASTER_003);
-	header("Location: menu_master.php");
+	header("Location: menu_master.php", true, 302);
 	exit;
 }
 
@@ -114,7 +114,7 @@ if ($getScrollPos !== null && $getScrollPos !== false) {
 	SessionHelper::setData($funcId, "scrollPos", $scrollPos);
 }
 
-$user_id = $auth->getCurrentUser()?->getUserId();
+$user_id = $auth->getCurrentUser()?->getLoginId();
 $checkData = array();  // チェック数加算結果
 
 // ロジック
@@ -125,9 +125,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$csrfScope = (string)($_POST[Utility::getCsrfScopeFieldName()] ?? '');
 	$csrfToken = (string)($_POST[Utility::getCsrfFieldName()] ?? '');
 	if (!Utility::validatePostedCsrfToken($csrfScope, $csrfToken)) {
-		$logger->error(basename(__FILE__).' op=product.check msg="Invalid csrf token" page=product_check.php user_id='.$auth->getCurrentUser()?->getUserId());
+		$logger->error(basename(__FILE__).' op=product.check msg="Invalid csrf token" page=product_check.php user_id='.$auth->getCurrentUser()?->getLoginId());
 		SessionHelper::FlushError(MessageConst::MSG_SYS_COMMON_900);
-		header("Location: " . $_SERVER['PHP_SELF']);
+		header('Location: product_check.php', true, 303);
 		exit;
 	}
 
@@ -235,7 +235,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 		// バーコードメニュー指定時にリダイレクトする
 		if ($cmdResult->isRedirect()) {
-			header("Location: {$cmdResult->getRedirectUrl()}");
+			header("Location: {$cmdResult->getRedirectUrl()}", true, 303);
 			exit;
 		}
 
@@ -253,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	}
 
 	// 画面表示はGETでredirect
-	header("Location: " . $_SERVER['PHP_SELF']);
+	header('Location: product_check.php', true, 303);
 	exit;
 }
 

@@ -6,7 +6,7 @@
  *        履歴一覧 history_list 
  */
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 
@@ -28,19 +28,19 @@ $logger = Logger::createDefault(dirname(__DIR__, 1));
 // 認証チェック
 $auth = new AuthService(new UserRepository(), $logger);
 if (!$auth->checkUserSession()) {
-	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getLoginId());
 	if (session_status() !== PHP_SESSION_ACTIVE) {
-		@session_start();
+		session_start();
 	}
 	SessionHelper::FlushError(MessageConst::MSG_INF_AUTH_002);
 	// チェック結果がエラーの場合ログイン画面に遷移
-	header("Location: index.php");
+	header("Location: index.php", true, 302);
 	exit;
 }
 // screenごとの権限チェック
 $filename = basename(__FILE__, '.php');
 if ($auth->getCurrentUser()?->can($filename) === false) {
-    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId());
+    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
 	http_response_code(403);
 	header('Content-Type: text/plain; charset=UTF-8');
 	echo MessageConst::MSG_INF_AUTH_003;
@@ -84,9 +84,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$csrfScope = (string)($_POST[Utility::getCsrfScopeFieldName()] ?? '');
 	$csrfToken = (string)($_POST[Utility::getCsrfFieldName()] ?? '');
 	if (!Utility::validatePostedCsrfToken($csrfScope, $csrfToken)) {
-		$logger->error(basename(__FILE__).' op=product.edit msg="Invalid csrf token" page=product_edit.php user_id='.$auth->getCurrentUser()?->getUserId());
+		$logger->error(basename(__FILE__).' op=product.edit msg="Invalid csrf token" page=product_edit.php user_id='.$auth->getCurrentUser()?->getLoginId());
 		SessionHelper::FlushError(MessageConst::MSG_SYS_COMMON_900);
-		header("Location: " . $_SERVER['PHP_SELF'], true, 303);
+		header('Location: product_edit.php', true, 303);
 		exit;
 	}
 
@@ -139,15 +139,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		} catch (\Exception $e) {
 			$msg = Utility::replaceStr(MessageConst::MSG_SYS_PRODUCT_013, $mngNo);
 			SessionHelper::flushError($msg);
-			$logger->error(basename(__FILE__).' op=product.delete msg="Error occurred during product delete" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId()).' detail='.$e->getMessage();
+			$logger->error(basename(__FILE__).' op=product.delete msg="Error occurred during product delete" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId()).' detail='.$e->getMessage();
 		}
 	}
 
 	// ----- いま確定している状態から「正規URL」を作る
 	$getParams = ['mn' => $mngNo];
 	$current = $_GET ?? [];
-	$url = basename($_SERVER['PHP_SELF']) . '?' . http_build_query($getParams);
-	header('Location: ' . $url, true, 302);
+	$url = 'product_edit.php' . '?' . http_build_query($getParams);
+	header('Location: ' . $url, true, 303);
 	exit;
 }
 
@@ -175,8 +175,8 @@ if (is_null($productData)) {
 	} catch (\Exception $e) {
 		$msg = Utility::replaceStr(MessageConst::MSG_SYS_PRODUCT_009, $mngNo);
 		SessionHelper::flushError($msg);
-		$logger->error(basename(__FILE__).' op=product.select msg="Error occurred during product select" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId()).' detail='.$e->getMessage();
-		header("Location: ".$backTo.".php");
+		$logger->error(basename(__FILE__).' op=product.select msg="Error occurred during product select" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId()).' detail='.$e->getMessage();
+		header("Location: ".$backTo.".php", true, 302);
 		exit;
 	}
 }

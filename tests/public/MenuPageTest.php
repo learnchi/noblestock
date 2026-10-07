@@ -37,6 +37,7 @@ final class MenuPageTest extends WebTestCase
         ]);
 
         $this->assertSame(200, $response->status);
+        $this->assertInitialStatus($response, 303);
         $this->assertStringContainsString('Location: index.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_VAL_AUTH_001, $response->body);
     }
@@ -52,8 +53,44 @@ final class MenuPageTest extends WebTestCase
         ]);
 
         $this->assertSame(200, $response->status);
+        $this->assertInitialStatus($response, 303);
         $this->assertStringContainsString('Location: index.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_VAL_AUTH_001, $response->body);
+    }
+
+    // 既存セッションで noauth としてログイン済みでも、user/pass を含む POST を menu.php に送ると
+    // セッションのログイン情報より POST が優先され、admin に切り替わって menu_master.php に遷移できることを確認する。
+    public function testLoginPostOverridesExistingSessionAndSwitchesUser(): void
+    {
+        $this->loginAs('noauth', 'noauth00');
+
+        $response = $this->getClient()->post('menu.php', [
+            'user' => 'admin',
+            'pass' => 'admin000',
+        ] + $this->issueCsrfPostData('index.login'));
+
+        $this->assertOk($response);
+
+        $menuMaster = $this->getClient()->get('menu_master.php');
+        $this->assertOk($menuMaster);
+    }
+
+    // 既存セッションで admin としてログイン済みでも、誤った user/pass を含む POST を menu.php に送ると
+    // 既存セッションにはフォールバックせず、index.php にリダイレクトされて認証エラーになることを確認する。
+    public function testInvalidLoginPostDoesNotFallBackToExistingSession(): void
+    {
+        $this->loginAsAdmin();
+
+        $response = $this->getClient()->post('menu.php', [
+            'user' => 'admin',
+            'pass' => 'wrong-password',
+        ] + $this->issueCsrfPostData('index.login'));
+
+        $this->assertSame(200, $response->status);
+        $this->assertInitialStatus($response, 303);
+        $this->assertStringContainsString('Location: index.php', $response->headers);
+        $this->assertStringContainsString(MessageConst::MSG_VAL_AUTH_001, $response->body);
+        $this->assertNull($this->runAuthSessionBridge('snapshot')['user'] ?? null);
     }
 
     /**
@@ -97,12 +134,6 @@ final class MenuPageTest extends WebTestCase
         $this->assertIsArray($locationList);
         $this->assertNotEmpty($locationList);
     }
-
-
-
-
-
-
 
     // POST値barcode=ABC000を送信し、「指定されたメニューが見つかりません」エラーメッセージが表示されることを確認する
     public function testProductShowDisplaysErrorWhenUnknownBarcodePosted(): void
@@ -183,12 +214,6 @@ final class MenuPageTest extends WebTestCase
         );
     }
 
-
-
-
-
-
-
     private function readMasterListFromCurrentSession(string $key): mixed
     {
         $bridgeName = '__menu_master_read_' . bin2hex(random_bytes(8)) . '.php';
@@ -196,7 +221,7 @@ final class MenuPageTest extends WebTestCase
         $bridgeCode = <<<'PHP'
 <?php
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 require_once __DIR__ . '/../vendor/autoload.php';

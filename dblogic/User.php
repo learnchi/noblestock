@@ -51,7 +51,7 @@ SQL2;
         // 監査項目用 userId を設定（取れなければ Database 側の SYSTEM のまま）
         
         $auth = new AuthService(new UserRepository(), $this->logger);
-        $userId = $auth->getCurrentUser()?->getUserId();
+        $userId = $auth->getCurrentUser()?->getLoginId();
         if (!empty($userId)) {
             $this->database->setCurrentUserId($userId);
         }
@@ -419,28 +419,28 @@ SQL2;
 	}
 
 	/**
-	 * uuser_idから、idを返却する
-	 * 存在しない場合は0を返却する
-	 * $excludeIdに、除外するidを指定することができる
+	 * login_idに対応するユーザーのidを返却する。
+	 * 存在しない場合はnullを返却する。
+	 * $excludeIdに、検索対象から除外するidを指定できる。
 	 */
-	public function getIdByUserId($user_id, $excludeId = null ) {
+	public function getIdByUserId($user_id, $excludeId = null): ?int {
 		$bindings = [
 			':login_id' => ['value' => $user_id, 'datatype' => \PDO::PARAM_STR],
 		];
 
 		$checkCntSql = 'SELECT id FROM users WHERE login_id = :login_id';
 
-		if (!empty($excludeId)) {
-			$checkCntSql .= ' AND ID <> :ID';
-			$bindings[':ID'] = ['value' => $excludeId, 'datatype' => \PDO::PARAM_INT];
+		if ($excludeId !== null) {
+			$checkCntSql .= ' AND id <> :exclude_id';
+			$bindings[':exclude_id'] = ['value' => $excludeId, 'datatype' => \PDO::PARAM_INT];
 		}
 
 		try {
 			$row = $this->database->fetchOne($checkCntSql, $bindings);
-			return $row;
-        } catch (RecordNotFoundException $e) { 
+			return (int) $row['id'];
+		} catch (RecordNotFoundException $e) {
 			// 許容されるエラー
-			return 0;
+			return null;
 		}
 	}
 

@@ -64,11 +64,33 @@ final class ProductBarcodeListPageTest extends WebTestCase
 
         $this->assertOk($response);
         $this->assertMatchesRegularExpression('/HTTP\/\d(?:\.\d)? 303/', $response->headers);
-        $this->assertStringContainsString('Location: /noblestock/public/product_barcode_list.php', $response->headers);
+        $this->assertStringContainsString('Location: product_barcode_list.php', $response->headers);
 
         $productListResponse = $this->getClient()->get('product_list.php');
         $this->assertOk($productListResponse);
         $this->assertMatchesRegularExpression('/const\s+scrollPos\s*=\s*4321\s*;/', $productListResponse->body);
+    }
+
+    // 画面のトークンで1枚出力すると、内部呼び出し先のCSRF検証も通過してExcelを返す
+    public function testProductBarcodeListRegistReturnsExcelAttachment(): void
+    {
+        $this->loginAsAdmin();
+        $this->seedSelectedMngNos(['ABC002']);
+        $displayResponse = $this->getClient()->get('product_barcode_list.php');
+        $this->assertOk($displayResponse);
+
+        $response = $this->getClient()->post('product_barcode_list.php', [
+            'mode' => 'regist',
+            'OUT_NUM_0' => '1',
+        ] + $this->extractCsrfPostData($displayResponse));
+
+        $this->assertInitialStatus($response, 200);
+        $this->assertOk($response);
+        $this->assertMatchesRegularExpression(
+            '/Content-Disposition: attachment;filename="product_barcode_\d{8}\.xlsx?"/i',
+            $response->headers
+        );
+        $this->assertNotEmpty($response->body);
     }
 
     // mode=regist の POST ではバーコード出力情報を作り、分割出力画面へ遷移する

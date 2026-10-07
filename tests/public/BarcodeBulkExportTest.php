@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Noblestock\DbLogic\Config;
 use Noblestock\DbLogic\Product;
+use Noblestock\DbLogic\User;
 use Noblestock\Logic\MessageConst;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -25,6 +26,7 @@ final class BarcodeBulkExportTest extends ImageWebTestCase
             'mode' => 'export',
         ]);
         $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertInitialStatus($response, 303);
         $this->assertStringContainsString('Location: index.php', $response->headers);
     }
 
@@ -37,6 +39,29 @@ final class BarcodeBulkExportTest extends ImageWebTestCase
             'mode' => 'export',
         ]);
         $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertInitialStatus($response, 303);
+        $this->assertStringContainsString('Location: index.php', $response->headers);
+        $this->assertStringContainsString(MessageConst::MSG_INF_AUTH_002, $response->body);
+    }
+
+    // セッション上のユーザーがDBから削除済みなら、セッションを破棄してindexへ戻る
+    public function testBarcodeBulkExportRedirectsWhenCurrentUserNoLongerExists(): void
+    {
+        \Tests\Support\TestDatabase::seed();
+        $this->loginAsAdmin();
+        $csrfFields = $this->issueCsrfPostData('barcode-bulk-missing-user', 'barcode_bulk_export.php');
+        (new User())->delete(null, 'admin');
+
+        try {
+            $response = $this->getClient()->post('barcode_bulk_export.php', [
+                'mode' => 'export',
+            ] + $csrfFields);
+        } finally {
+            \Tests\Support\TestDatabase::seed();
+        }
+
+        $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertInitialStatus($response, 303);
         $this->assertStringContainsString('Location: index.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_INF_AUTH_002, $response->body);
     }
@@ -285,10 +310,10 @@ final class BarcodeBulkExportTest extends ImageWebTestCase
     {
         $bridgeName = '__barcode_bulk_session_' . bin2hex(random_bytes(8)) . '.php';
         $bridgePath = dirname(__DIR__, 2) . '/public/' . $bridgeName;
-        $bridgeCode = <<<'PHP'
+                $bridgeCode = <<<'PHP'
 <?php
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 require_once __DIR__ . '/../vendor/autoload.php';

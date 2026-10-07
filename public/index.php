@@ -2,7 +2,7 @@
 /**
  * ログイン画面
  */
-@session_start();
+session_start();
 
 require_once(__DIR__ . '/../vendor/autoload.php');
 
@@ -12,10 +12,8 @@ use Studiogau\Chandra\Support\Utility;
 // ログイン画面に戻ったら古いログイン情報をクリア
 $flashError = SessionHelper::getFlushError();
 $flashSuccess = SessionHelper::getFlushSuccess();
-SessionHelper::delSessionAll();
-if (session_status() !== PHP_SESSION_ACTIVE) {
-	@session_start();
-}
+// 既存セッションを無効化し、新しいセッションを開始する
+SessionHelper::invalidateSession(true);
 ?>
 
 <!DOCTYPE html>
@@ -43,7 +41,7 @@ if (session_status() !== PHP_SESSION_ACTIVE) {
 		<form method="post" name="login" class="login-container" action="menu.php">
 			<?= Utility::renderCsrfHiddenInput('index.login') ?>
 			<h1><img class="m-4" width="72" height="72" src="img/logos.png">ログイン</h1>
-			<input type="text" name="user" class="form-control" value="" maxlength="16" onchange="inputHanCheck(document.login.user);" onkeyup="inputHanCheck(document.login.user);" placeholder="ログインID">
+			<input type="text" name="user" class="form-control" value="" maxlength="16" placeholder="ログインID">
 			<input type="password" name="pass" class="form-control" value="" maxlength="128" placeholder="パスワード">
 			<button type="submit" name="admin" class="btn btn-primary w-100">ログイン</button>
 		</form>

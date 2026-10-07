@@ -13,7 +13,7 @@ use Noblestock\Logic\LogicConst;
 final class TestDatabase
 {
     private const DBCONFIG = __DIR__ . '/../..' . LogicConst::DB_CONFIG_PATH;
-    private const DEFAULT_MYSQL_BASE = 'C:\\xampp_chandra\\mysql\\bin';
+    private const DEFAULT_MYSQL_BASE = __DIR__ . '/../../../../mysql/bin';  // 注意
 
     private static ?string $backupFile = null;
     private static bool $registeredShutdown = false;

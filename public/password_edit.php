@@ -3,7 +3,7 @@
  * パスワード変更 画面
  */
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 
@@ -25,19 +25,19 @@ $logger = Logger::createDefault(dirname(__DIR__, 1));
 // 認証チェック
 $auth = new AuthService(new UserRepository(), $logger);
 if (!$auth->checkUserSession()) {
-	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getLoginId());
 	if (session_status() !== PHP_SESSION_ACTIVE) {
-		@session_start();
+		session_start();
 	}
 	SessionHelper::FlushError(MessageConst::MSG_INF_AUTH_002);
 	// チェック結果がエラーの場合ログイン画面に遷移
-	header("Location: index.php");
+	header("Location: index.php", true, 302);
 	exit;
 }
 // screenごとの権限チェック不要
 
 
-$user_id = $auth->getCurrentUser()?->getUserId();
+$user_id = $auth->getCurrentUser()?->getLoginId();
 
 // ロジック処理
 $user = new User();
@@ -49,10 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $logger->error(
                 basename(__FILE__)
                 .' op=changePassword msg="Invalid csrf token" page=password_edit.php user_id='
-                .$auth->getCurrentUser()?->getUserId()
+                .$auth->getCurrentUser()?->getLoginId()
             );
             SessionHelper::FlushError(MessageConst::MSG_SYS_COMMON_900);
-            header("Location: " . $_SERVER['PHP_SELF']);
+            header('Location: password_edit.php', true, 303);
             exit;
         }
 		
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 		// 画面の案内文どおり、サーバー側でも半角英数字 3-16 文字を確認
 		if (!UtilCommon::isAcceptablePasswordInput($old_pass) || !UtilCommon::isValidPassword($new_pass)) {
 			SessionHelper::FlushError(MessageConst::MSG_SYS_AUTH_006);
-			header("Location: " . $_SERVER['PHP_SELF']);
+			header('Location: password_edit.php', true, 303);
 			exit;
 		}
 		try {
@@ -69,13 +69,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			// 成功
 			SessionHelper::FlushSuccess(MessageConst::MSG_OK_AUTH_005);
 			// ログイン画面に遷移
-			header("Location: index.php");
+			header("Location: index.php", true, 303);
 			exit;
 		} catch (\Throwable $e) { 
 			$logger->error(
 				basename(__FILE__)
 				.' op=changePassword msg="Error occurred during password update" page=password_edit.php user_id='
-				.$auth->getCurrentUser()?->getUserId()
+				.$auth->getCurrentUser()?->getLoginId()
 				.' detail='.$e->getMessage()
 			);
 			SessionHelper::FlushError(MessageConst::MSG_SYS_AUTH_006);
@@ -83,7 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 	}
     // 画面表示はGETでredirect
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header('Location: password_edit.php', true, 303);
     exit;
 }
 

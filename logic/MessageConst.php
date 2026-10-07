@@ -199,7 +199,7 @@ class MessageConst {
 	const MSG_INF_USER_002 = "ユーザー情報を編集して更新ボタンを押してください";
 	const MSG_SYS_USER_003 = "入力されたログインIDが既に存在します";
 	const MSG_SYS_USER_004 = "ユーザーを取得できませんでした ログインID：{0}";
-	const MSG_SYS_USER_005 = "ログインIDは3～16文字の英数字で入力してください";
+	const MSG_SYS_USER_005 = "ログインIDは3～16文字の半角英数字またはハイフンで入力してください";
 	const MSG_SYS_USER_006 = "パスワードは8～128文字で入力してください";
 	const MSG_SYS_USER_007 = "メールアドレスを正しく入力してください";
 	const MSG_OK_USER_008 = "ユーザーを登録しました ログインID：{0}";

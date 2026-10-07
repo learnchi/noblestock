@@ -7,7 +7,7 @@ namespace Noblestock\Logic;
  *     $target = $router->resolve($bcin);
  * 
  *     if ($target !== null) {
- *         header("Location: {$target}");
+ *         header("Location: {$target}", true, 303);
  *         exit;
  *     }
  * 

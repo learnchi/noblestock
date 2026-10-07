@@ -5,7 +5,7 @@
  *        商品登録 product_create
  */
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 
@@ -25,19 +25,19 @@ $logger = Logger::createDefault(dirname(__DIR__, 1));
 // 認証チェック
 $auth = new AuthService(new UserRepository(), $logger);
 if (!$auth->checkUserSession()) {
-	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getUserId());
+	$logger->error(basename(__FILE__)." checkUserSession failed for user id id=".$auth->getCurrentUser()?->getLoginId());
 	if (session_status() !== PHP_SESSION_ACTIVE) {
-		@session_start();
+		session_start();
 	}
 	SessionHelper::FlushError(MessageConst::MSG_INF_AUTH_002);
 	// チェック結果がエラーの場合ログイン画面に遷移
-	header("Location: index.php");
+	header("Location: index.php", true, 302);
 	exit;
 }
 // screenごとの権限チェック
 $filename = basename(__FILE__, '.php');
 if ($auth->getCurrentUser()?->can($filename) === false) {
-    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId());
+    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
 	http_response_code(403);
 	header('Content-Type: text/plain; charset=UTF-8');
 	echo MessageConst::MSG_INF_AUTH_003;
@@ -77,9 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	$csrfScope = (string)($_POST[Utility::getCsrfScopeFieldName()] ?? '');
 	$csrfToken = (string)($_POST[Utility::getCsrfFieldName()] ?? '');
 	if (!Utility::validatePostedCsrfToken($csrfScope, $csrfToken)) {
-		$logger->error(basename(__FILE__).' op=image.create msg="Invalid csrf token" page=image_create.php user_id='.$auth->getCurrentUser()?->getUserId());
+		$logger->error(basename(__FILE__).' op=image.create msg="Invalid csrf token" page=image_create.php user_id='.$auth->getCurrentUser()?->getLoginId());
 		SessionHelper::FlushError(MessageConst::MSG_SYS_COMMON_900);
-		header("Location: " . $_SERVER['PHP_SELF']);
+		header('Location: image_create.php', true, 303);
 		exit;
 	}
 
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					$uploadPath = __DIR__."/".LogicConst::DIR_IMAGES."/".$fnm;
 					if (is_dir($uploadPath)) {
 						sessionHelper::flushError(MessageConst::MSG_SYS_IMAGE_009);
-						$logger->warn(basename(__FILE__).' op=imgup msg="upload destination is a directory" page='.$filename.' path='.$uploadPath.' user_id='.$auth->getCurrentUser()?->getUserId());
+						$logger->warn(basename(__FILE__).' op=imgup msg="upload destination is a directory" page='.$filename.' path='.$uploadPath.' user_id='.$auth->getCurrentUser()?->getLoginId());
 					} else if (move_uploaded_file($_FILES["upfile"]["tmp_name"], $uploadPath)) {
 						$productData['image_file'] = $fnm;
 						Utility::checkImageCreate(__DIR__."/".LogicConst::DIR_IMAGES."/", $fnm, 240);
@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					} else {
 						// アップロードエラー
 						sessionHelper::flushError(MessageConst::MSG_SYS_IMAGE_009);
-						$logger->warn(basename(__FILE__).' op=imgup msg="image file upload error" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId());
+						$logger->warn(basename(__FILE__).' op=imgup msg="image file upload error" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
 					}
 				} else {
 					// サイズオーバーエラーの表示
@@ -127,7 +127,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			if (!@unlink($delImg)) {
 				// 削除失敗
 				sessionHelper::flushError(Utility::replaceStr(MessageConst::MSG_SYS_IMAGE_010, $delImg));
-				$logger->warn(basename(__FILE__).' op=delImage msg="image file delete error" page='.$filename.' filename='.$delImg.' user_id='.$auth->getCurrentUser()?->getUserId());
+				$logger->warn(basename(__FILE__).' op=delImage msg="image file delete error" page='.$filename.' filename='.$delImg.' user_id='.$auth->getCurrentUser()?->getLoginId());
 
 			} else {
 				sessionHelper::flushSuccess(Utility::replaceStr(MessageConst::MSG_OK_IMAGE_004, $delImg));
@@ -138,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			if (!@unlink($delSmallImg)) {
 				// 削除失敗
 				sessionHelper::flushError(Utility::replaceStr(MessageConst::MSG_SYS_IMAGE_011, $delSmallImg));
-				$logger->warn(basename(__FILE__).' op=delImage msg="image thumbnail file delete error" page='.$filename.' filename='.$delSmallImg.' user_id='.$auth->getCurrentUser()?->getUserId());
+				$logger->warn(basename(__FILE__).' op=delImage msg="image thumbnail file delete error" page='.$filename.' filename='.$delSmallImg.' user_id='.$auth->getCurrentUser()?->getLoginId());
 			}
 		}
 
@@ -169,7 +169,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 	SessionHelper::setData('biz003', "productData", $productData);    // セッション管理ID biz003: 商品単票
 
     // 画面表示はGETでredirect
-    header("Location: " . $_SERVER['PHP_SELF']);
+    header('Location: image_create.php', true, 303);
     exit;
 }
 

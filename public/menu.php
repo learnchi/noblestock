@@ -1,5 +1,5 @@
 <?php
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 // composerを使用
@@ -10,7 +10,9 @@ use Studiogau\Chandra\Auth\LoginCredentials;
 use Studiogau\Chandra\Support\SessionHelper;
 use Studiogau\Chandra\Support\Utility;
 use Studiogau\Chandra\Auth\AuthException;
-use Noblestock\Logic\AuthServiceFactory;
+use Noblestock\DbLogic\UserRepository;
+use Studiogau\Chandra\Auth\AuthService;
+use Noblestock\Logic\LoginRateLimitGuard;
 use Noblestock\Logic\MenuRouter;
 use Noblestock\DbLogic\Config;
 use Noblestock\DbLogic\Category;
@@ -23,24 +25,22 @@ use Noblestock\Logic\MessageConst;
 $logger = Logger::createDefault(dirname(__DIR__, 1));
 
 // 認証チェック
-$auth = AuthServiceFactory::create($logger);
+$auth = new AuthService(
+            new UserRepository(),
+            $logger,
+            [new LoginRateLimitGuard(null, $logger)]
+        );
 
-if (!$auth->checkUserSession()) {
-	if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
-		if (session_status() !== PHP_SESSION_ACTIVE) {
-			@session_start();
-		}
-		SessionHelper::flushError(MessageConst::MSG_INF_AUTH_002);
-		header("Location: index.php");
-		exit;
-	}
+$requestMethod = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$hasLoginPost = array_key_exists('user', $_POST) || array_key_exists('pass', $_POST);
 
+if ($requestMethod === 'POST' && $hasLoginPost) {
 	$csrfScope = (string)($_POST[Utility::getCsrfScopeFieldName()] ?? '');
 	$csrfToken = (string)($_POST[Utility::getCsrfFieldName()] ?? '');
 	if (!Utility::validatePostedCsrfToken($csrfScope, $csrfToken)) {
 		$logger->error(basename(__FILE__).' op=login msg="Invalid csrf token" page=menu.php');
 		SessionHelper::flushError(MessageConst::MSG_SYS_COMMON_900);
-		header("Location: index.php");
+		header("Location: index.php", true, 303);
 		exit;
 	}
 
@@ -53,15 +53,22 @@ if (!$auth->checkUserSession()) {
 		$logger->error(basename(__FILE__)." login returned Error:".$e->getMessage());
 		SessionHelper::flushError(MessageConst::MSG_VAL_AUTH_001);
 		// チェック結果がエラーの場合ログイン画面に遷移
-		header("Location: index.php");
+		header("Location: index.php", true, 303);
 		exit;
 	} catch (\Throwable $e) { 
 		$logger->error(basename(__FILE__)." login returned Error:".$e->getMessage());
 		SessionHelper::flushError(MessageConst::MSG_SYS_COMMON_900);    // システムエラー
 		// チェック結果がエラーの場合ログイン画面に遷移
-		header("Location: index.php");
+		header("Location: index.php", true, 303);
 		exit;
 	}
+} elseif (!$auth->checkUserSession()) {
+	if (session_status() !== PHP_SESSION_ACTIVE) {
+		session_start();
+	}
+	SessionHelper::flushError(MessageConst::MSG_INF_AUTH_002);
+	header("Location: index.php", true, 302);
+	exit;
 }
 // screenごとの権限チェック不要
 
@@ -113,9 +120,9 @@ if ($bcin !== '') {
 	$csrfScope = (string)($_POST[Utility::getCsrfScopeFieldName()] ?? '');
 	$csrfToken = (string)($_POST[Utility::getCsrfFieldName()] ?? '');
 	if (!Utility::validatePostedCsrfToken($csrfScope, $csrfToken)) {
-		$logger->error(basename(__FILE__).' op=barcode msg="Invalid csrf token" page=menu.php user_id='.$auth->getCurrentUser()?->getUserId());
+		$logger->error(basename(__FILE__).' op=barcode msg="Invalid csrf token" page=menu.php user_id='.$auth->getCurrentUser()?->getLoginId());
 		SessionHelper::flushError(MessageConst::MSG_SYS_COMMON_900);
-		header("Location: menu.php");
+		header("Location: menu.php", true, 303);
 		exit;
 	}
 
@@ -124,7 +131,7 @@ if ($bcin !== '') {
     $target = $router->resolve($bcin);
 
     if ($target !== null) {
-        header("Location: {$target}");
+        header("Location: {$target}", true, 303);
         exit;
     }
 

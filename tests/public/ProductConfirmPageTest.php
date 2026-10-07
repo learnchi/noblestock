@@ -272,7 +272,7 @@ final class ProductConfirmPageTest extends ImageWebTestCase
         ));
 
         $this->assertOk($response);
-        $this->assertStringContainsString('Location: /noblestock/public/product_confirm.php', $response->headers);
+        $this->assertStringContainsString('Location: product_confirm.php', $response->headers);
 
         return $productData;
     }
@@ -348,7 +348,7 @@ final class ProductConfirmPageTest extends ImageWebTestCase
         ]);
 
         $this->assertOk($response);
-        $this->assertStringContainsString('Location: /noblestock/public/product_create.php', $response->headers);
+        $this->assertStringContainsString('Location: product_create.php', $response->headers);
     }
 
     // public/uploads にある表示可能な画像名を 1 件取得する。

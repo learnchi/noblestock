@@ -18,7 +18,10 @@ final class UserEditInfoRenderTest extends WebTestCase
         $response = $this->getClient()->get('user_create.php');
         $this->assertOk($response);
 
+        $this->assertXPathCount($response, "//form[@action='user_confirm.php']//label[@for='login_id']", 1);
+        $loginId = $this->getSingleElement($response, "//form[@action='user_confirm.php']//input[@name='login_id']");
         $password = $this->getSingleElement($response, "//form[@action='user_confirm.php']//input[@name='password_hash']");
+        $this->assertLoginIdValidationAttributes($loginId);
         $this->assertTrue($password->hasAttribute('required'));
         $this->assertSame('128', $password->getAttribute('maxlength'));
         $this->assertSame('8', $password->getAttribute('minlength'));
@@ -37,10 +40,13 @@ final class UserEditInfoRenderTest extends WebTestCase
         ]);
         $this->assertOk($response);
 
+        $this->assertXPathCount($response, "//form[@action='user_edit_confirm.php']//label[@for='login_id']", 1);
         $id = $this->getSingleElement($response, "//form[@action='user_edit_confirm.php']//input[@name='id']");
+        $loginId = $this->getSingleElement($response, "//form[@action='user_edit_confirm.php']//input[@name='login_id']");
         $password = $this->getSingleElement($response, "//form[@action='user_edit_confirm.php']//input[@name='password_hash']");
 
         $this->assertSame('2', $id->getAttribute('value'));
+        $this->assertLoginIdValidationAttributes($loginId);
         $this->assertFalse($password->hasAttribute('required'));
         $this->assertSame('128', $password->getAttribute('maxlength'));
         $this->assertSame('8', $password->getAttribute('minlength'));
@@ -63,6 +69,14 @@ final class UserEditInfoRenderTest extends WebTestCase
         self::$client = new WebClient('http://localhost/noblestock/public');
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
+    }
+
+    private function assertLoginIdValidationAttributes(DOMElement $loginId): void
+    {
+        $this->assertTrue($loginId->hasAttribute('required'));
+        $this->assertSame('3', $loginId->getAttribute('minlength'));
+        $this->assertSame('16', $loginId->getAttribute('maxlength'));
+        $this->assertSame('[0-9A-Za-z-]+', $loginId->getAttribute('pattern'));
     }
 
     private function assertXPathCount(Response $response, string $xpathExpression, int $expectedCount): void

@@ -250,7 +250,7 @@ class LogicConst {
 	// 在庫数低下バッチ設定
 	const BATCH_SW = true;  //true：起動する  false：起動しない
 	// const BATCH_PATH = "/usr/local/php5.3/bin/php ";    // linux
-	const BATCH_PATH = "C:\\xampp_chandra\\php\\php.exe ";    // windows XAMPP
+	const BATCH_PATH = __DIR__ . '/../../../php/php.exe';    // windows XAMPP
 	// const BATCH_RTN = " > /dev/null &";    // linux
 	const BATCH_RTN = " > NUL 2>&1";    // windows
 

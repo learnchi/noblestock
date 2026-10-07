@@ -2,7 +2,7 @@
 /**
  * 分割ファイル出力をするための選択画面 (汎用)
  */
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 
@@ -22,20 +22,20 @@ $logger = Logger::createDefault(dirname(__DIR__, 1));
 // 認証チェック
 $auth = new AuthService(new UserRepository(), $logger);
 if (!$auth->checkUserSession()) {
-    $logger->error(basename(__FILE__).' checkUserSession failed for user id id='.$auth->getCurrentUser()?->getUserId());
+    $logger->error(basename(__FILE__).' checkUserSession failed for user id id='.$auth->getCurrentUser()?->getLoginId());
     if (session_status() !== PHP_SESSION_ACTIVE) {
-        @session_start();
+        session_start();
     }
     SessionHelper::FlushError(MessageConst::MSG_INF_AUTH_002);
     // チェック結果がエラーの場合ログイン画面に遷移
-    header("Location: index.php");
+    header("Location: index.php", true, 302);
     exit;
 }
 // screenごとの権限チェック
 
 $filename = basename(__FILE__, '.php');
 if ($auth->getCurrentUser()?->can($filename) === false) {
-    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getUserId());
+    $logger->error(basename(__FILE__).' op=auth msg="Permission denied" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
     http_response_code(403);
     header('Content-Type: text/plain; charset=UTF-8');
     echo MessageConst::MSG_INF_AUTH_003;

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use Noblestock\DbLogic\User;
 use Noblestock\Logic\LogicConst;
 use Noblestock\Logic\MessageConst;
 use Tests\Support\Response;
@@ -33,6 +34,24 @@ final class BarcodeCreatePageTest extends WebTestCase
         $this->loginAsAdmin();
         $response = $this->getClient()->get('barcode_create.php');
         $this->assertOk($response);
+    }
+
+    // セッション上のユーザーがDBから削除済みなら、セッションを破棄してindexへ戻る
+    public function testBarcodeCreateRedirectsWhenCurrentUserNoLongerExists(): void
+    {
+        \Tests\Support\TestDatabase::seed();
+        $this->loginAsAdmin();
+        (new User())->delete(null, 'admin');
+
+        try {
+            $response = $this->getClient()->get('barcode_create.php');
+        } finally {
+            \Tests\Support\TestDatabase::seed();
+        }
+
+        $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertStringContainsString('Location: index.php', $response->headers);
+        $this->assertStringContainsString(MessageConst::MSG_INF_AUTH_002, $response->body);
     }
 
     // この画面に権限があるユーザー[perm06]で200で表示される

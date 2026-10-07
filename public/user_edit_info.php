@@ -20,9 +20,9 @@ $pwRequired = isset($pwRequired) ? $pwRequired: False;
 
 <input type="hidden" name="id" value="<?=Utility::h($userData['id'] ?? '') ?>">
 <div class="row mb-3">
-<label for="management_no" class="col-sm-2 col-form-label">ログインID</label>
+<label for="login_id" class="col-sm-2 col-form-label">ログインID</label>
 <div class="col-sm-10">
-	<input type="text" class="form-control form-control-sm <?= isset($errors['login_id']) ? 'is-invalid': '' ?>" id="login_id" name="login_id" maxlength="16" value="<?=Utility::h($userData['login_id'] ?? '') ?>" required>
+	<input type="text" class="form-control form-control-sm <?= isset($errors['login_id']) ? 'is-invalid': '' ?>" id="login_id" name="login_id" minlength="3" maxlength="16" pattern="[0-9A-Za-z-]+" value="<?=Utility::h($userData['login_id'] ?? '') ?>" required>
 	<div class="invalid-feedback"><?= isset($errors['login_id']) ? Utility::h($errors['login_id']) : MessageConst::MSG_SYS_USER_005 ?></div>
 </div>
 </div>

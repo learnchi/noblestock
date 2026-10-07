@@ -24,6 +24,7 @@ final class SalesShowExportTest extends WebTestCase
             'mode' => 'export',
         ]);
         $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertInitialStatus($response, 303);
         $this->assertStringContainsString('Location: index.php', $response->headers);
     }
 
@@ -36,6 +37,7 @@ final class SalesShowExportTest extends WebTestCase
             'mode' => 'export',
         ]);
         $this->assertSame(200, $response->status, "Expected final 200 from {$response->url}");
+        $this->assertInitialStatus($response, 303);
         $this->assertStringContainsString('Location: index.php', $response->headers);
         $this->assertStringContainsString(MessageConst::MSG_INF_AUTH_002, $response->body);
     }

@@ -157,9 +157,8 @@ final class BarcodeProcessorTest extends TestCase
         };
 
         $auth = new AuthService($repo);
-        $auth->setCurrentUser(new LoginUser('tester', 'Tester', $permissions));
+        $auth->setCurrentUser(new LoginUser('tester-id', 'tester', 'Tester', $permissions));
 
         return $auth;
     }
 }
-

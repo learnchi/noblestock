@@ -89,7 +89,18 @@ abstract class WebTestCase extends TestCase
     }
 
     /**
-     * POST 実行後に Location ヘッダーの遷移先を検証する共通アサート。
+     * 自動リダイレクト前のステータスを検証する。100 Continue 等は除外する。
+     * Response::status は遷移後のステータスなので、保存されたヘッダーを調べる。
+     */
+    protected function assertInitialStatus(Response $response, int $expected): void
+    {
+        $matched = preg_match('/^HTTP\/\S+ ([2-5][0-9]{2})\b/m', $response->headers, $matches);
+        $this->assertSame(1, $matched, 'Initial HTTP status was not found.');
+        $this->assertSame($expected, (int) $matches[1], "Unexpected initial status from {$response->url}");
+    }
+
+    /**
+     * POST の303応答と Location ヘッダーの遷移先を検証する共通アサート。
      *
      * @param array<string, mixed> $postData
      */
@@ -104,6 +115,7 @@ abstract class WebTestCase extends TestCase
         }
 
         $response = $this->getClient()->post($path, $postData);
+        $this->assertInitialStatus($response, 303);
         $this->assertOk($response);
         $this->assertStringContainsString("Location: {$expectedLocation}", $response->headers);
 
@@ -190,7 +202,7 @@ abstract class WebTestCase extends TestCase
      * - `    SessionHelper::setData('biz002', 'selectedMngNos', ['ABC005']);`
      * - `}, 'product_barcode_list.php');`
      */
-    protected function withCurrentWebSession(callable $action, string $scriptName = '/noblestock/public/index.php'): void
+    protected function withCurrentWebSession(callable $action, string $scriptName = 'index.php'): void
     {
         $targetSessionId = $this->readPhpSessionIdFromCookieJar();
         $normalizedScriptName = $this->normalizeScriptName($scriptName);
@@ -239,7 +251,7 @@ abstract class WebTestCase extends TestCase
         string $func,
         string $key,
         mixed $value,
-        string $scriptName = '/noblestock/public/index.php'
+        string $scriptName = 'index.php'
     ): void {
         $this->withCurrentWebSession(
             static function () use ($func, $key, $value): void {
@@ -259,7 +271,7 @@ abstract class WebTestCase extends TestCase
     protected function delSessionStructData(
         string $func,
         ?string $key = null,
-        string $scriptName = '/noblestock/public/index.php'
+        string $scriptName = 'index.php'
     ): void {
         $this->withCurrentWebSession(
             static function () use ($func, $key): void {
@@ -276,7 +288,7 @@ abstract class WebTestCase extends TestCase
      */
     protected function issueCsrfPostData(
         string $scope,
-        string $scriptName = '/noblestock/public/index.php'
+        string $scriptName = 'index.php'
     ): array {
         $token = '';
 
@@ -325,7 +337,7 @@ abstract class WebTestCase extends TestCase
 declare(strict_types=1);
 
 session_cache_limiter("none");
-@session_start();
+session_start();
 date_default_timezone_set('Asia/Tokyo');
 
 require_once __DIR__ . '/../vendor/autoload.php';
@@ -420,8 +432,8 @@ PHP;
     /**
      * SCRIPT_NAME を SessionHelper 用に正規化する。
      *
-     * - 空文字: `/noblestock/public/index.php`
-     * - 先頭 `/` なし: `/noblestock/public/` を補完
+     * - 空文字: `/your-project/public/index.php`
+     * - 先頭 `/` なし: `/your-project/public/` を補完
      * - 先頭 `/` あり: そのまま使用
      */
     private function normalizeScriptName(string $scriptName): string
