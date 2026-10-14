@@ -471,6 +471,7 @@ endif;
 </h5>
 		<!-- ボタン -->
 		<form  method="post" action="master_bulk_edit.php">
+            <?= Utility::renderCsrfHiddenInput('master_bulk_edit.actions') ?>
 			<div class="d-flex justify-content-evenly">
 			<a href="menu_master.php" type="button" class="btn btn-primary">戻る</a>
 				<?php if (count($checkedExcelList ?? []) > 0) :?>

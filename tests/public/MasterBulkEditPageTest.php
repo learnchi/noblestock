@@ -11,6 +11,48 @@ use Tests\Support\WebTestCase;
 
 final class MasterBulkEditPageTest extends WebTestCase
 {
+    // 実際のボタン用フォームのトークンで、メニュー・店舗のバーコードを出力できる。
+    public function testBarcodeExportAcceptsTokenFromButtonForm(): void
+    {
+        $this->openMasterBulkEditAsAdmin();
+
+        foreach (['0', '4'] as $masterNo) {
+            $page = $this->selectMaster($masterNo);
+            $xpath = new DOMXPath($page->dom());
+            $form = $xpath->query("//form[.//button[@formaction='barcode_bulk_export.php']]")->item(0);
+            $this->assertNotNull($form, 'Barcode export form must exist.');
+
+            // ダウンロード前の画面に残る「選択」用トークンを保存する。
+            $selectionForm = $xpath->query("//form[.//button[@name='mode' and @value='selectMaster']]")->item(0);
+            $this->assertNotNull($selectionForm);
+            $selectionFields = ['mode' => 'selectMaster', 'masterNo' => '2', '_skip_auto_csrf' => true];
+            foreach (['_csrf_scope', '_csrf_token'] as $name) {
+                $inputs = $xpath->query(".//input[@type='hidden' and @name='" . $name . "']", $selectionForm);
+                $this->assertSame(1, $inputs->length);
+                $selectionFields[$name] = $inputs->item(0)->getAttribute('value');
+            }
+
+            $fields = ['mode' => 'export', '_skip_auto_csrf' => true];
+            foreach (['_csrf_scope', '_csrf_token'] as $name) {
+                $inputs = $xpath->query(".//input[@type='hidden' and @name='" . $name . "']", $form);
+                $this->assertSame(1, $inputs->length, 'Missing CSRF field in barcode export form: ' . $name);
+                $fields[$name] = $inputs->item(0)->getAttribute('value');
+                $this->assertNotSame('', $fields[$name]);
+            }
+
+            $response = $this->getClient()->post('barcode_bulk_export.php', $fields);
+            $this->assertOk($response);
+            $this->assertStringContainsString('Content-Disposition: attachment;', $response->headers);
+            $this->assertNotSame('', $response->body);
+
+            // 画面の再取得やトークン自動補完なしで「選択」を送信する。
+            $selected = $this->getClient()->post('master_bulk_edit.php', $selectionFields);
+            $this->assertOk($selected);
+            $this->assertStringNotContainsString(MessageConst::MSG_SYS_COMMON_900, $selected->body);
+            $this->assertSelectedMaster($selected, '2');
+        }
+    }
+
     // ログインセッションをクリア後、この画面にアクセスすると、indexに遷移する
     public function testMasterBulkEditRedirectsToIndex(): void
     {

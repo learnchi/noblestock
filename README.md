@@ -1,43 +1,43 @@
 # NobleStock
 
-NobleStock は、PHP フレームワーク Chandra 上で動作する在庫管理アプリケーションです。  
-バーコード発行、入庫・出庫・移動、棚卸、各種マスタ管理、Excel 入出力を中心とした業務向けの構成になっています。
+NobleStock は、PHP フレームワーク Chandra で作成した在庫管理アプリケーションです。  
+複数店舗間での商品の入出庫などの在庫管理をバーコードで操作できる、店舗や倉庫で役立つ業務アプリケーションです。
 
-## 主な機能
+## 機能
 
-- 商品・在庫・画像・ユーザー・各種マスタの管理
-- バーコード生成とバーコードを使った在庫操作
-- 棚卸、履歴参照、売上参照
-- Excel による一括登録・出力
+- 商品情報・商品画像・店舗別在庫の管理
+- バーコードの生成・出力と、読み取りによる入出庫・店舗間移動
+- 棚卸の在庫チェックと、実績・履歴の確認
+- Excelによる商品・在庫・各種マスタの一括登録・出力
+- ユーザー管理と画面ごとの権限設定
 
-## 技術構成
+## インストール
 
-- PHP
-- Chandra
-- MySQL / MariaDB
-- Bootstrap 5
-- PhpSpreadsheet
-- PHPMailer
-
-## セットアップ
-
-1. 依存関係をインストールします。
+リポジトリを取得し、Composerで依存ライブラリをインストールします。
 
 ```bash
+git clone https://github.com/learnchi/noblestock.git
+cd noblestock
 composer install
 ```
 
-2. データベース設定を用意します。
+続いてデータベースを作成し、接続情報を設定します。環境の準備から初回ログインまでの手順は、[Windowsでの導入手順](https://learnchi.github.io/noblestock/setup.html)をご覧ください。
 
-- `config/dbconfig.sample.ini` を `config/dbconfig.ini` としてコピーして編集する
-- または環境変数 `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASS`, `DB_CHARSET` を設定する
+## ドキュメント
 
-3. メール設定が必要な場合は、以下のいずれかで設定します。
+- [Windowsでの導入手順](https://learnchi.github.io/noblestock/setup.html)
 
-- `config/mailconfig.sample.ini` を `config/mailconfig.ini` としてコピーして編集する
-- または環境変数 `MAIL_SMTP_HOST`, `MAIL_SMTP_PORT`, `MAIL_SMTP_AUTH`, `MAIL_SMTP_USER`, `MAIL_SMTP_PASS`, `MAIL_SMTP_SECURE`, `MAIL_FROM` を設定する
+  XAMPPとComposerの準備、DB設定、起動と初回ログインまでを案内します。
+- [機能と使い方](https://learnchi.github.io/noblestock/guide.html)
 
-4. Web サーバの公開ディレクトリを `public/` に向けます。
+  マスタ・商品の登録、商品画像、バーコードによる入出庫・移動、権限設定を紹介します。
+
+## 動作環境
+
+- PHP 8.2以上
+- MySQL / MariaDB
+- Apache
+- Composer
 
 ## テスト
 
@@ -45,8 +45,6 @@ composer install
 vendor/bin/phpunit
 ```
 
-## 公開時の注意
+## ライセンス
 
-- `config/dbconfig.ini`, `config/mailconfig.ini` のような実運用設定は公開しないでください
-- `log/`, `tmp/`, `public/uploads/` などの生成物や運用データは公開対象から除外してください
-- 本リポジトリにはソースコードのみを含め、環境依存の認証情報は含めない想定です
+MIT
