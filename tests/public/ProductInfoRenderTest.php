@@ -61,7 +61,7 @@ final class ProductInfoRenderTest extends ImageWebTestCase
     private function prepareProductShowAsAdmin(): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }

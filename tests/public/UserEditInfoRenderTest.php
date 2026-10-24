@@ -58,7 +58,7 @@ final class UserEditInfoRenderTest extends WebTestCase
     private function prepareUserCreateAsAdmin(): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }
@@ -66,7 +66,7 @@ final class UserEditInfoRenderTest extends WebTestCase
     private function prepareUserEditAsAdmin(): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }

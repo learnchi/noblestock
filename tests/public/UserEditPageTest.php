@@ -224,7 +224,7 @@ final class UserEditPageTest extends WebTestCase
     private function prepareUserEditAsAdmin(): void
     {
         \Tests\Support\TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }
@@ -232,7 +232,7 @@ final class UserEditPageTest extends WebTestCase
     private function prepareUserEditAsPerm18(): void
     {
         \Tests\Support\TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAs('perm18', 'perm1800');
         $this->getClient()->get('menu.php');
     }

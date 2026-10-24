@@ -228,7 +228,7 @@ final class HistoryConfirmPageTest extends WebTestCase
     private function prepareHistoryConfirmAs(string $loginId, string $password): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAs($loginId, $password);
         $this->getClient()->get('menu.php');
     }

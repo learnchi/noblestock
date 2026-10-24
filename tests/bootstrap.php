@@ -11,6 +11,7 @@ date_default_timezone_set('Asia/Tokyo');
 // Helper classes for tests
 require_once __DIR__ . '/Support/TestDatabase.php';
 require_once __DIR__ . '/Support/TestImageFiles.php';
+require_once __DIR__ . '/Support/TestWebConfig.php';
 require_once __DIR__ . '/Support/WebClient.php';
 require_once __DIR__ . '/Support/WebTestCase.php';
 require_once __DIR__ . '/Support/ImageWebTestCase.php';

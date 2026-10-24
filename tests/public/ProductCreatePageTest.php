@@ -500,6 +500,8 @@ final class ProductCreatePageTest extends ImageWebTestCase
     {
         $bridgeName = '__product_create_session_' . bin2hex(random_bytes(8)) . '.php';
         $bridgePath = dirname(__DIR__, 2) . '/public/' . $bridgeName;
+        $payload['scriptName'] = self::scriptName((string) ($payload['scriptName'] ?? 'product_create.php'));
+        $defaultScriptNameLiteral = var_export(self::scriptName('product_create.php'), true);
         $bridgeCode = <<<'PHP'
 <?php
 session_cache_limiter("none");
@@ -511,8 +513,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Studiogau\Chandra\Support\SessionHelper;
 
 $payload = json_decode(file_get_contents('php://input'), true);
-$scriptName = (string) ($payload['scriptName'] ?? 'product_create.php');
-$_SERVER['SCRIPT_NAME'] = '/noblestock/public/' . ltrim($scriptName, '/');
+$_SERVER['SCRIPT_NAME'] = (string) ($payload['scriptName'] ?? __DEFAULT_SCRIPT_NAME__);
 
 if (($payload['mode'] ?? 'seed') === 'read') {
     header('Content-Type: application/json');
@@ -553,6 +554,7 @@ if (is_string($payload['flushSuccess'] ?? null) && $payload['flushSuccess'] !== 
 header('Content-Type: application/json');
 echo json_encode(['ok' => true], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 PHP;
+        $bridgeCode = str_replace('__DEFAULT_SCRIPT_NAME__', $defaultScriptNameLiteral, $bridgeCode);
 
         file_put_contents($bridgePath, $bridgeCode);
 

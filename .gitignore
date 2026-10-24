@@ -32,6 +32,7 @@ Thumbs.db
 .env
 dbconfig.ini
 mailconfig.ini
+/tests/testweb.ini
 
 # OS/ツールによる一時ファイル
 *.~*

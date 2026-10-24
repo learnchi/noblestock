@@ -320,7 +320,7 @@ final class ProductEditPageTest extends WebTestCase
     // テストごとに新しい WebClient を使ってセッションを分離する。
     private function resetWebClient(): void
     {
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
     }
     // セッション期限切れ時に認証情報と画面用セッションが破棄されることを確認する
     public function testProductEditClearsSessionDataWhenTimedOut(): void

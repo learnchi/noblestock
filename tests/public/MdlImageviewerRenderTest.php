@@ -48,7 +48,7 @@ final class MdlImageviewerRenderTest extends ImageWebTestCase
     private function prepareUserCreateAsAdmin(): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }
@@ -56,7 +56,7 @@ final class MdlImageviewerRenderTest extends ImageWebTestCase
     private function prepareProductShowAsAdmin(): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }

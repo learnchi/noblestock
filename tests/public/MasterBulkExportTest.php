@@ -166,7 +166,7 @@ final class MasterBulkExportTest extends WebTestCase
     private function prepareMasterBulkExportAsAdmin(): void
     {
         \Tests\Support\TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }
@@ -174,7 +174,7 @@ final class MasterBulkExportTest extends WebTestCase
     private function prepareMasterBulkExportAsPerm15(): void
     {
         \Tests\Support\TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAs('perm15', 'perm1500');
         $this->getClient()->get('menu.php');
     }

@@ -13,9 +13,9 @@ final class WebClient
     private string $baseUrl;
     private string $cookieFile;
 
-    public function __construct(string $baseUrl)
+    public function __construct(?string $baseUrl = null)
     {
-        $this->baseUrl = rtrim($baseUrl, '/') . '/';
+        $this->baseUrl = rtrim($baseUrl ?? TestWebConfig::baseUrl(), '/') . '/';
         $this->cookieFile = tempnam(sys_get_temp_dir(), 'noble-cookie-');
     }
 
@@ -214,15 +214,7 @@ final class WebClient
     private function normalizeScriptName(string $path): string
     {
         $parsedPath = (string) parse_url($path, PHP_URL_PATH);
-        if ($parsedPath === '') {
-            return '/noblestock/public/index.php';
-        }
-
-        if (str_starts_with($parsedPath, '/')) {
-            return $parsedPath;
-        }
-
-        return '/noblestock/public/' . ltrim($parsedPath, '/');
+        return TestWebConfig::scriptName($parsedPath === '' ? 'index.php' : $parsedPath);
     }
 
     private function readPhpSessionIdFromCookieJar(): string

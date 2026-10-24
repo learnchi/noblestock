@@ -218,6 +218,7 @@ final class MenuPageTest extends WebTestCase
     {
         $bridgeName = '__menu_master_read_' . bin2hex(random_bytes(8)) . '.php';
         $bridgePath = dirname(__DIR__, 2) . '/public/' . $bridgeName;
+        $scriptNameLiteral = var_export(self::scriptName('menu.php'), true);
         $bridgeCode = <<<'PHP'
 <?php
 session_cache_limiter("none");
@@ -228,13 +229,14 @@ require_once __DIR__ . '/../vendor/autoload.php';
 
 use Studiogau\Chandra\Support\SessionHelper;
 
-$_SERVER['SCRIPT_NAME'] = '/noblestock/public/menu.php';
+$_SERVER['SCRIPT_NAME'] = __SCRIPT_NAME__;
 
 header('Content-Type: application/json');
 echo json_encode([
     'value' => SessionHelper::getMasterList((string) ($_GET['key'] ?? '')),
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 PHP;
+        $bridgeCode = str_replace('__SCRIPT_NAME__', $scriptNameLiteral, $bridgeCode);
 
         file_put_contents($bridgePath, $bridgeCode);
 

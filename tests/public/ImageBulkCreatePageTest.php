@@ -95,6 +95,13 @@ final class ImageBulkCreatePageTest extends ImageWebTestCase
 
             $this->assertFileExists($this->uploadsPath($validUploadName));
             $this->assertFileExists($this->uploadsPath('s_' . $validUploadName));
+            // サムネイルが読み取れる画像であり、幅が1〜240px、高さが1〜180pxであることを確認する。
+            $thumbnailSize = getimagesize($this->uploadsPath('s_' . $validUploadName));
+            $this->assertIsArray($thumbnailSize);
+            $this->assertGreaterThan(0, $thumbnailSize[0]);
+            $this->assertLessThanOrEqual(240, $thumbnailSize[0]);
+            $this->assertGreaterThan(0, $thumbnailSize[1]);
+            $this->assertLessThanOrEqual(180, $thumbnailSize[1]);
         $this->assertFileDoesNotExist($this->uploadsPath($invalidUploadName));
         $this->assertFileDoesNotExist($this->uploadsPath('s_' . $invalidUploadName));
     }

@@ -21,7 +21,6 @@ use Studiogau\Chandra\Support\Utility;
 abstract class WebTestCase extends TestCase
 {
     protected static ?WebClient $client = null;
-    private const BASE_URL = 'http://localhost/noblestock/public';
 
     /**
      * クラス単位の初期化。
@@ -31,7 +30,7 @@ abstract class WebTestCase extends TestCase
     public static function setUpBeforeClass(): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient(self::BASE_URL);
+        self::$client = self::newWebClient();
     }
 
     /**
@@ -43,9 +42,29 @@ abstract class WebTestCase extends TestCase
     protected function getClient(): WebClient
     {
         if (self::$client === null) {
-            self::$client = new WebClient(self::BASE_URL);
+            self::$client = self::newWebClient();
         }
         return self::$client;
+    }
+
+    protected static function baseUrl(): string
+    {
+        return TestWebConfig::baseUrl();
+    }
+
+    protected static function publicPath(string $path = ''): string
+    {
+        return TestWebConfig::publicPath($path);
+    }
+
+    protected static function scriptName(string $path = 'index.php'): string
+    {
+        return TestWebConfig::scriptName($path);
+    }
+
+    protected static function newWebClient(): WebClient
+    {
+        return new WebClient(self::baseUrl());
     }
 
     /**
@@ -438,15 +457,7 @@ PHP;
      */
     private function normalizeScriptName(string $scriptName): string
     {
-        if ($scriptName === '') {
-            return '/noblestock/public/index.php';
-        }
-
-        if (str_starts_with($scriptName, '/')) {
-            return $scriptName;
-        }
-
-        return '/noblestock/public/' . ltrim($scriptName, '/');
+        return self::scriptName($scriptName === '' ? 'index.php' : $scriptName);
     }
 
     /**

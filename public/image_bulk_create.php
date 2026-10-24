@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 							// アップロード成功
 							//chmod($dirFileName, 0644);
 							// サムネイル作成
-							$rtnSmall = Utility::creatSmallImage($dirName, $imgFileName, 240);
+							$rtnSmall = Utility::createSmallImage($dirName, $imgFileName, 240);
 							if (!$rtnSmall) {
 								$logger->warn(basename(__FILE__, '.php').' op=bulk.imgup msg="failed to make thumbnail image." page='.$filename.' file='.$dirFileName.' user_id='.$auth->getCurrentUser()?->getLoginId());
 							}

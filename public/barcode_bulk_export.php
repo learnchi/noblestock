@@ -144,7 +144,7 @@ for ($i = 0; $i < $barcnt; $i++) {
 			$targetFile = $dirImg.$wk['img_file'];
 			$createFile = $dirTmp.$userSeq."s_product".$i.".png";
 			$imgSize = 40;
-			if (!Utility::creatImageSize34($targetFile, $createFile, $imgSize)) {
+			if (!Utility::createImageSize34($targetFile, $createFile, $imgSize)) {
 				if (file_exists($createFile)) {
 					unlink($createFile);
 				}

@@ -40,7 +40,7 @@ final class SalesShowPageTest extends WebTestCase
     // 実績詳細権限を持つ perm09 でも表示できる
     public function testSalesShowDisplaysForPerm09(): void
     {
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAs('perm09', 'perm0900');
         $this->getClient()->get('menu.php');
 
@@ -51,7 +51,7 @@ final class SalesShowPageTest extends WebTestCase
     // 権限のない noauth では 403 になる
     public function testSalesShowReturns403ForNoAuth(): void
     {
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAs('noauth', 'noauth00');
         $this->getClient()->get('menu.php');
 
@@ -241,7 +241,7 @@ final class SalesShowPageTest extends WebTestCase
 
     private function prepareSalesShowAsAdmin(): void
     {
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }

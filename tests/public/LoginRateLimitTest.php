@@ -91,7 +91,7 @@ final class LoginRateLimitTest extends WebTestCase
     private function resetLoginAttemptState(): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->getClient()->get('index.php');
     }
 

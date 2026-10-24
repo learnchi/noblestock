@@ -190,6 +190,7 @@ final class BarcodeListExportSplitPageTest extends WebTestCase
     {
         $bridgeName = '__barcode_split_session_' . bin2hex(random_bytes(8)) . '.php';
         $bridgePath = dirname(__DIR__, 2) . '/public/' . $bridgeName;
+        $scriptNameLiteral = var_export(self::scriptName('barcode_list_export_split.php'), true);
         $bridgeCode = <<<'PHP'
 <?php
 session_cache_limiter("none");
@@ -201,7 +202,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Studiogau\Chandra\Support\SessionHelper;
 
 $payload = json_decode(file_get_contents('php://input'), true);
-$_SERVER['SCRIPT_NAME'] = '/noblestock/public/barcode_list_export_split.php';
+$_SERVER['SCRIPT_NAME'] = __SCRIPT_NAME__;
 
 SessionHelper::delData('com901', null);
 SessionHelper::setData('com901', 'barFile', $payload['barFile'] ?? 'product');
@@ -214,6 +215,7 @@ foreach (($payload['prefs'] ?? []) as $key => $value) {
 header('Content-Type: application/json');
 echo json_encode(['ok' => true], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 PHP;
+        $bridgeCode = str_replace('__SCRIPT_NAME__', $scriptNameLiteral, $bridgeCode);
 
         file_put_contents($bridgePath, $bridgeCode);
 

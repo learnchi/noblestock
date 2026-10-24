@@ -207,7 +207,7 @@ final class UserEditConfirmPageTest extends WebTestCase
     private function prepareUserEditConfirmAsAdmin(): void
     {
         \Tests\Support\TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
         $this->getClient()->post('user_edit.php', [
@@ -218,7 +218,7 @@ final class UserEditConfirmPageTest extends WebTestCase
     private function prepareUserEditConfirmAsPerm18(): void
     {
         \Tests\Support\TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAs('perm18', 'perm1800');
         $this->getClient()->get('menu.php');
         $this->getClient()->post('user_edit.php', [

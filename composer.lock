@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "8c2fe256b13bbb18310cad4129d14083",
+    "content-hash": "0bba732044eca50995c2fa6435c0d635",
     "packages": [
         {
             "name": "composer/pcre",
@@ -588,16 +588,16 @@
         },
         {
             "name": "studiogau/chandra",
-            "version": "v0.2.0",
+            "version": "v0.3.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/learnchi/chandra.git",
-                "reference": "fe6cbd7f3ee57706d48c64474807d50f85beea70"
+                "reference": "006bc67781e797e4a9f991c89f7783e4552d4195"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/learnchi/chandra/zipball/fe6cbd7f3ee57706d48c64474807d50f85beea70",
-                "reference": "fe6cbd7f3ee57706d48c64474807d50f85beea70",
+                "url": "https://api.github.com/repos/learnchi/chandra/zipball/006bc67781e797e4a9f991c89f7783e4552d4195",
+                "reference": "006bc67781e797e4a9f991c89f7783e4552d4195",
                 "shasum": ""
             },
             "require": {
@@ -623,7 +623,7 @@
                 }
             ],
             "description": "Lightweight PHP framework for building business applications and CMS with simplicity.",
-            "time": "2026-04-28T09:29:07+00:00"
+            "time": "2026-10-22T08:25:08+00:00"
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -698,16 +698,16 @@
         },
         {
             "name": "symfony/http-foundation",
-            "version": "v7.4.20",
+            "version": "v7.4.21",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/http-foundation.git",
-                "reference": "9d0761c0da6bd5b801b401666834901a9a1ffc33"
+                "reference": "58c89144c7a36dd89c3d01917e9fa3a72d8aaf31"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/9d0761c0da6bd5b801b401666834901a9a1ffc33",
-                "reference": "9d0761c0da6bd5b801b401666834901a9a1ffc33",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/58c89144c7a36dd89c3d01917e9fa3a72d8aaf31",
+                "reference": "58c89144c7a36dd89c3d01917e9fa3a72d8aaf31",
                 "shasum": ""
             },
             "require": {
@@ -756,7 +756,7 @@
             "description": "Defines an object-oriented layer for the HTTP specification",
             "homepage": "https://symfony.com",
             "support": {
-                "source": "https://github.com/symfony/http-foundation/tree/v7.4.20"
+                "source": "https://github.com/symfony/http-foundation/tree/v7.4.21"
             },
             "funding": [
                 {
@@ -776,7 +776,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2026-09-24T07:12:44+00:00"
+            "time": "2026-10-08T16:56:12+00:00"
         },
         {
             "name": "symfony/polyfill-mbstring",

@@ -139,7 +139,7 @@ final class ListExportSplitPageTest extends WebTestCase
     {
         $bridgeName = '__list_export_split_session_' . bin2hex(random_bytes(8)) . '.php';
         $bridgePath = dirname(__DIR__, 2) . '/public/' . $bridgeName;
-        $normalizedScriptName = '/noblestock/public/' . ltrim($scriptName, '/');
+        $normalizedScriptName = self::scriptName($scriptName);
 
         $bridgeCode = <<<PHP
 <?php

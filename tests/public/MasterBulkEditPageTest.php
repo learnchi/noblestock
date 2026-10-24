@@ -277,7 +277,7 @@ final class MasterBulkEditPageTest extends WebTestCase
     private function prepareMasterBulkEditAsAdmin(): void
     {
         \Tests\Support\TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }

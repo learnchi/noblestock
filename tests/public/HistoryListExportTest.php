@@ -151,7 +151,7 @@ final class HistoryListExportTest extends WebTestCase
         $this->prepareLargeHistoryListDataset(2005);
 
         try {
-            self::$client = new WebClient('http://localhost/noblestock/public');
+            self::$client = self::newWebClient();
             $this->loginAsAdmin();
             $this->getClient()->get('menu.php');
             $this->updateExcelSettings([
@@ -220,7 +220,7 @@ final class HistoryListExportTest extends WebTestCase
     private function prepareHistoryListExportAs(string $loginId, string $password): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAs($loginId, $password);
         $this->getClient()->get('menu.php');
     }

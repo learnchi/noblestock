@@ -718,6 +718,7 @@ final class ProductListPageTest extends WebTestCase
     {
         $bridgeName = '__product_list_session_' . bin2hex(random_bytes(8)) . '.php';
         $bridgePath = dirname(__DIR__, 2) . '/public/' . $bridgeName;
+        $scriptNameLiteral = var_export(self::scriptName('product_list.php'), true);
         $bridgeCode = <<<'PHP'
 <?php
 session_cache_limiter("none");
@@ -729,7 +730,7 @@ require_once __DIR__ . '/../vendor/autoload.php';
 use Studiogau\Chandra\Support\SessionHelper;
 
 $payload = json_decode(file_get_contents('php://input'), true);
-$_SERVER['SCRIPT_NAME'] = '/noblestock/public/product_list.php';
+$_SERVER['SCRIPT_NAME'] = __SCRIPT_NAME__;
 
 SessionHelper::delData('biz002', null);
 if (is_array($payload) && array_key_exists('selectedMngNos', $payload) && is_array($payload['selectedMngNos'])) {
@@ -739,6 +740,7 @@ if (is_array($payload) && array_key_exists('selectedMngNos', $payload) && is_arr
 header('Content-Type: application/json');
 echo json_encode(['ok' => true], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 PHP;
+        $bridgeCode = str_replace('__SCRIPT_NAME__', $scriptNameLiteral, $bridgeCode);
 
         file_put_contents($bridgePath, $bridgeCode);
 

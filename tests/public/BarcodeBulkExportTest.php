@@ -230,6 +230,13 @@ final class BarcodeBulkExportTest extends ImageWebTestCase
             $sheet = $this->loadWorksheetFromResponse($response, 'xlsx');
             $this->assertSame($productData['management_no'], (string) $sheet->getCell('A1')->getValue());
             $this->assertSame($productData['product_name'], (string) $sheet->getCell('A3')->getValue());
+            // バーコード画像と商品画像の2枚がExcelに埋め込まれ、どちらも幅・高さが0より大きいことを確認する。
+            $drawings = iterator_to_array($sheet->getDrawingCollection());
+            $this->assertCount(2, $drawings, 'Barcode and product image must both be embedded.');
+            foreach ($drawings as $drawing) {
+                $this->assertGreaterThan(0, $drawing->getWidth());
+                $this->assertGreaterThan(0, $drawing->getHeight());
+            }
         } finally {
             $this->restoreProductData($originalProductData);
             $this->restoreBarcodeSettings($originalSettings);
@@ -253,11 +260,24 @@ final class BarcodeBulkExportTest extends ImageWebTestCase
     // settings.php を通してバーコード出力関連設定を更新する。
     private function updateBarcodeSettings(array $settings): void
     {
+        // 同じ値の再保存は更新件数0でエラーになるため、変更のある設定だけを送る。
+        $currentSettings = $this->snapshotBarcodeSettings();
+        $settings = array_filter(
+            $settings,
+            static fn($value, $key) => (string) $value !== ($currentSettings[$key] ?? null),
+            ARRAY_FILTER_USE_BOTH
+        );
+        if ($settings === []) {
+            return;
+        }
+
         $response = $this->getClient()->post('settings.php', array_merge($settings, [
             'mode' => 'update',
         ]));
 
         $this->assertOk($response);
+        // HTTP 200だけでは途中のエラーを見逃すため、保存後のリダイレクトも確認する。
+        $this->assertStringContainsString('Location: settings.php', $response->headers);
         $this->assertStringContainsString('settings.php', $response->headers . $response->body);
     }
 
@@ -310,7 +330,8 @@ final class BarcodeBulkExportTest extends ImageWebTestCase
     {
         $bridgeName = '__barcode_bulk_session_' . bin2hex(random_bytes(8)) . '.php';
         $bridgePath = dirname(__DIR__, 2) . '/public/' . $bridgeName;
-                $bridgeCode = <<<'PHP'
+        $scriptNameLiteral = var_export(self::scriptName('barcode_bulk_export.php'), true);
+        $bridgeCode = <<<'PHP'
 <?php
 session_cache_limiter("none");
 session_start();
@@ -322,10 +343,12 @@ use Studiogau\Chandra\Support\SessionHelper;
 use Studiogau\Chandra\Support\Utility;
 
 $payload = json_decode(file_get_contents('php://input'), true);
-$_SERVER['SCRIPT_NAME'] = '/noblestock/public/barcode_bulk_export.php';
+$_SERVER['SCRIPT_NAME'] = __SCRIPT_NAME__;
 
 SessionHelper::setData('com901', 'barFile', $payload['barFile'] ?? '');
 SessionHelper::setData('com901', 'barlist', $payload['barList'] ?? []);
+// 実画面と同じく、出力時に参照するラベルサイズもセッションへ設定する。
+SessionHelper::setData('com901', 'barSize', (int) SessionHelper::getPref('BAR_PRT_SIZE'));
 if (array_key_exists('backTo', $payload) && $payload['backTo'] !== null) {
     SessionHelper::setData('com901', 'backTo', $payload['backTo']);
 } else {
@@ -344,6 +367,7 @@ echo json_encode([
     'csrfToken' => $token,
 ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 PHP;
+        $bridgeCode = str_replace('__SCRIPT_NAME__', $scriptNameLiteral, $bridgeCode);
 
         file_put_contents($bridgePath, $bridgeCode);
 

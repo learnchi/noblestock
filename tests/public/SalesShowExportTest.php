@@ -205,7 +205,7 @@ final class SalesShowExportTest extends WebTestCase
     private function prepareSalesShowExportAsAdmin(): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }
@@ -213,7 +213,7 @@ final class SalesShowExportTest extends WebTestCase
     private function prepareSalesShowExportAsPerm09(): void
     {
         TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAs('perm09', 'perm0900');
         $this->getClient()->get('menu.php');
     }

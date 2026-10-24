@@ -132,7 +132,7 @@ final class ConfigPageTest extends WebTestCase
     private function prepareConfigAsAdmin(): void
     {
         \Tests\Support\TestDatabase::seed();
-        self::$client = new WebClient('http://localhost/noblestock/public');
+        self::$client = self::newWebClient();
         $this->loginAsAdmin();
         $this->getClient()->get('menu.php');
     }
