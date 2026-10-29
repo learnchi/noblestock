@@ -141,7 +141,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					// 更新成功
 					SessionHelper::FlushSuccess(Utility::replaceStr(MessageConst::MSG_OK_HISTORY_001,$historyData['management_no'],$historyData["branch_no"]));
 				}
-				header("Location:".$backTo.".php", true, 303);
+				header("Location: ".$backTo.".php", true, 303);
 				exit;
 			} catch (Exception $e) {
     			$logger->error(basename(__FILE__).' op=history.update msg="update failed" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId()).' detail='.$e->getMessage();

@@ -162,7 +162,7 @@ if (isset($_POST["mode"])) {
 			// 更新成功
 			$resultMsg = Utility::replaceStr(MessageConst::MSG_OK_PRODUCT_011, $productData['management_no']);
 			SessionHelper::flushSuccess($resultMsg);
-			header("Location:".$backTo.".php", true, 303);
+			header("Location: ".$backTo.".php", true, 303);
 			exit;
 		} catch (\Throwable $e) {
 			$logger->error(basename(__FILE__) .  " ".$e->getMessage());

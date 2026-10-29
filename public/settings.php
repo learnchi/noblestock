@@ -131,6 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 			}
 		}
 		// 設定更新
+		$hasError = false;
 		foreach ($setMst as $i => $wk) {
 
 			if (isset($_POST[$wk["config_key"]])) {
@@ -139,13 +140,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					"value_int" => $_POST[$wk["config_key"]],
 					"value_str" => null,
 				];
-				if ($config->update($wkup) === 1) {
+				try {
+					$config->update($wkup);
 					SessionHelper::setPref($wk["config_key"], $_POST[$wk["config_key"]]);
-					SessionHelper::flushSuccess(MessageConst::MSG_OK_CONF_002);
-				} else {
-					SessionHelper::flushError(MessageConst::MSG_SYS_COMMON_900);
+				} catch (\Throwable $e) {
+					$hasError = true;
+					$logger->error(basename(__FILE__).' op=settings.update msg="update failed" config_key='.$wk["config_key"].' detail='.$e->getMessage());
 				}
 			}
+		}
+		if ($hasError) {
+			SessionHelper::flushError(MessageConst::MSG_SYS_COMMON_900);
+		} else {
+			SessionHelper::flushSuccess(MessageConst::MSG_OK_CONF_002);
 		}
 	}
     // 画面表示はGETでredirect

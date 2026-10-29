@@ -26,7 +26,7 @@ Thumbs.db
 /log/*
 /tmp/*
 /public/uploads/*
-/Tests/tmp/*
+/tests/tmp/
 
 # 環境設定
 .env

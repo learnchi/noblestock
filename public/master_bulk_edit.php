@@ -130,7 +130,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 					} else {
 						// ファイルアップロードエラー
 						SessionHelper::flushError(MessageConst::MSG_SYS_FILE_004);
-						$logger->error(basename(__FILE__).' op=master msg="update failed" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId()).' detail='.$e->getMessage();
+						$logger->error(basename(__FILE__).' op=master msg="upload failed" page='.$filename.' user_id='.$auth->getCurrentUser()?->getLoginId());
 					}
 				} else {
 					// Excel以外

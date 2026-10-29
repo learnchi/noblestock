@@ -76,8 +76,13 @@ SQL;
         $affected = 0;
 		
         $affected  = $this->database->update(self::TABLE_NAME, $values, $conditions);
-        // 1行だけのはず
-        if ($affected !== 1) {
+        // MariaDBでは同じ値を再保存すると変更件数が0になるため、設定キーが存在すれば正常とする。
+        // 存在しない設定キーへの更新は、引き続きエラーとする。
+        $unchangedExistingRow = $affected === 0 && $this->database->fetchCount(
+            'SELECT COUNT(*) FROM configs WHERE config_key = :config_key',
+            [':config_key' => $conditions['config_key']]
+        ) === 1;
+        if ($affected !== 1 && !$unchangedExistingRow) {
             throw new \RuntimeException('Update affected rows mismatch (expected=1, actual=' . $affected . ')');
         }
 

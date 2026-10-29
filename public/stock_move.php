@@ -6,7 +6,7 @@ session_cache_limiter("none");
 session_start();
 date_default_timezone_set('Asia/Tokyo');
 
-require_once(__DIR__."/../Logic/Limitlogic.php");
+require_once(__DIR__."/../Logic/LimitLogic.php");
 
 // composerを使用
 require_once(__DIR__ . '/../vendor/autoload.php');
